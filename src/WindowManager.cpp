@@ -54,20 +54,28 @@ int runWindowManager() {
       std::cout << "Received: ConfigureRequest" << '\n';
       XConfigureRequestEvent e = evt.xconfigurerequest;
       XWindowChanges changes;
-      changes.x = e.x;
-      changes.y = e.y;
+      changes.x = 10;
+      changes.y = 10;
       changes.width = e.width;
       changes.height = e.height;
-      changes.border_width = e.border_width;
+      changes.border_width = 0;
       changes.sibling = e.above;
       changes.stack_mode = e.detail;
-      XConfigureWindow(display, e.window, e.value_mask, &changes);
+      std::cout << e.value_mask << '\n';
+      XConfigureWindow(display, e.window,
+                       e.value_mask | CWX | CWY | CWBorderWidth, &changes);
       break;
     }
-    case MapRequest:
+    case MapRequest: {
       std::cout << "Received: MapRequest" << '\n';
+      XWindowChanges changes;
+      changes.x = 10;
+      changes.y = 10;
+      changes.border_width = 0;
+      XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
       XMapWindow(display, evt.xmaprequest.window);
       break;
+    }
     default:
       std::cout << "Ignored Event: ";
       std::cout << "[" << evt.type << "] ";
