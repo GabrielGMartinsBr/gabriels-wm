@@ -6,7 +6,8 @@ include(CTest)
 enable_testing()
 
 # Source Files
-file(GLOB source_files src/*.cpp)
+# file(GLOB source_files src/*.cpp)
+file(GLOB_RECURSE source_files src/*.cpp)
 
 # CPack 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

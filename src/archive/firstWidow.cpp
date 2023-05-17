@@ -1,4 +1,4 @@
-#include "./log.h"
+#include "../utils/log.h"
 #include <X11/Xlib.h>
 #include <unistd.h>
 

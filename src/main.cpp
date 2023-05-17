@@ -1,5 +1,5 @@
-#include "./firstWindow.h"
+#include "./WindowManager.h"
 
 int main(int, char **) {
-  return createFirstWindow();
+  return runWindowManager();
 }
