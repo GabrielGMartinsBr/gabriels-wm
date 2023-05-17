@@ -1,12 +1,11 @@
+#include <X11/X.h>
 #include <X11/Xlib.h>
-#include <cstdlib>
-#include <exception>
 #include <iostream>
 #include <stdexcept>
-#include <system_error>
 
-#include "./utils/log.h"
+#include "./utils/codes.h"
 
+// Error Handler
 int onWindowManagerDetected(Display *display, XErrorEvent *e) {
   if (e->error_code == BadAccess) {
     // WM events already handled by another program
@@ -15,6 +14,9 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e) {
   return 0;
 }
 
+void onMapRequest(const XMapRequestEvent &evt) {}
+
+// Run
 int runWindowManager() {
   Display *display = XOpenDisplay(nullptr);
   if (display == nullptr) {
@@ -30,13 +32,51 @@ int runWindowManager() {
   XSetErrorHandler(&onWindowManagerDetected);
   XSync(display, false);
 
-  Log("Window Manager opened!");
+  std::cout << "Window Manager opened!\n";
+
+  XEvent evt;
 
   while (true) {
+    XNextEvent(display, &evt);
+
+    switch (evt.type) {
+    case CreateNotify:
+      std::cout << "Received: CreateNotify" << '\n';
+      break;
+    case ReparentNotify:
+      std::cout << "Received: ReparentNotify" << '\n';
+      break;
+    case DestroyNotify:
+      std::cout << "Received: DestroyNotify" << '\n';
+      break;
+
+    case ConfigureRequest: {
+      std::cout << "Received: ConfigureRequest" << '\n';
+      XConfigureRequestEvent e = evt.xconfigurerequest;
+      XWindowChanges changes;
+      changes.x = e.x;
+      changes.y = e.y;
+      changes.width = e.width;
+      changes.height = e.height;
+      changes.border_width = e.border_width;
+      changes.sibling = e.above;
+      changes.stack_mode = e.detail;
+      XConfigureWindow(display, e.window, e.value_mask, &changes);
+      break;
+    }
+    case MapRequest:
+      std::cout << "Received: MapRequest" << '\n';
+      XMapWindow(display, evt.xmaprequest.window);
+      break;
+    default:
+      std::cout << "Ignored Event: ";
+      std::cout << "[" << evt.type << "] ";
+      std::cout << getEventName(evt) << '\n';
+    }
   }
 
   XCloseDisplay(display);
-  Log("Closing Window Manager...");
+  std::cout << "Closing Window Manager...\n";
 
   return EXIT_SUCCESS;
 }
