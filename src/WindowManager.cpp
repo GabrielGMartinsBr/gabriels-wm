@@ -1,12 +1,14 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
+
 #include <iostream>
 #include <stdexcept>
 
 #include "./utils/codes.h"
 
 // Error Handler
-int onWindowManagerDetected(Display *display, XErrorEvent *e) {
+int onWindowManagerDetected(Display *display, XErrorEvent *e)
+{
   if (e->error_code == BadAccess) {
     // WM events already handled by another program
     throw std::runtime_error("window manager detected");
@@ -14,10 +16,11 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e) {
   return 0;
 }
 
-void onMapRequest(const XMapRequestEvent &evt) {}
+void onMapRequest(const XMapRequestEvent &evt) { }
 
 // Run
-int runWindowManager() {
+int runWindowManager()
+{
   Display *display = XOpenDisplay(nullptr);
   if (display == nullptr) {
     // Could not establish a connection with x server
@@ -40,46 +43,45 @@ int runWindowManager() {
     XNextEvent(display, &evt);
 
     switch (evt.type) {
-    case CreateNotify:
-      std::cout << "Received: CreateNotify" << '\n';
-      break;
-    case ReparentNotify:
-      std::cout << "Received: ReparentNotify" << '\n';
-      break;
-    case DestroyNotify:
-      std::cout << "Received: DestroyNotify" << '\n';
-      break;
+      case CreateNotify:
+        std::cout << "Received: CreateNotify" << '\n';
+        break;
+      case ReparentNotify:
+        std::cout << "Received: ReparentNotify" << '\n';
+        break;
+      case DestroyNotify:
+        std::cout << "Received: DestroyNotify" << '\n';
+        break;
 
-    case ConfigureRequest: {
-      std::cout << "Received: ConfigureRequest" << '\n';
-      XConfigureRequestEvent e = evt.xconfigurerequest;
-      XWindowChanges changes;
-      changes.x = 10;
-      changes.y = 10;
-      changes.width = e.width;
-      changes.height = e.height;
-      changes.border_width = 0;
-      changes.sibling = e.above;
-      changes.stack_mode = e.detail;
-      std::cout << e.value_mask << '\n';
-      XConfigureWindow(display, e.window,
-                       e.value_mask | CWX | CWY | CWBorderWidth, &changes);
-      break;
-    }
-    case MapRequest: {
-      std::cout << "Received: MapRequest" << '\n';
-      XWindowChanges changes;
-      changes.x = 10;
-      changes.y = 10;
-      changes.border_width = 0;
-      XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
-      XMapWindow(display, evt.xmaprequest.window);
-      break;
-    }
-    default:
-      std::cout << "Ignored Event: ";
-      std::cout << "[" << evt.type << "] ";
-      std::cout << getEventName(evt) << '\n';
+      case ConfigureRequest: {
+        std::cout << "Received: ConfigureRequest" << '\n';
+        XConfigureRequestEvent e = evt.xconfigurerequest;
+        XWindowChanges changes;
+        changes.x = 10;
+        changes.y = 10;
+        changes.width = e.width;
+        changes.height = e.height;
+        changes.border_width = 0;
+        changes.sibling = e.above;
+        changes.stack_mode = e.detail;
+        std::cout << e.value_mask << '\n';
+        XConfigureWindow(display, e.window, e.value_mask | CWX | CWY | CWBorderWidth, &changes);
+        break;
+      }
+      case MapRequest: {
+        std::cout << "Received: MapRequest" << '\n';
+        XWindowChanges changes;
+        changes.x = 10;
+        changes.y = 10;
+        changes.border_width = 0;
+        XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
+        XMapWindow(display, evt.xmaprequest.window);
+        break;
+      }
+      default:
+        std::cout << "Ignored Event: ";
+        std::cout << "[" << evt.type << "] ";
+        std::cout << getEventName(evt) << '\n';
     }
   }
 
