@@ -2,5 +2,9 @@
 
 int main(int, char **)
 {
-  return runWindowManager();
+  WindowManager wm;
+
+  wm.run();
+
+  return 0;
 }

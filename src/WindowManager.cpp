@@ -1,11 +1,7 @@
-#include <X11/X.h>
-#include <X11/Xlib.h>
+#include "./WindowManager.h"
 
-#include <iostream>
-#include <stdexcept>
-
-#include "./utils/codes.h"
 #include "./FrameWindow.h"
+#include "./utils/codes.h"
 
 // Error Handler
 int onWindowManagerDetected(Display *display, XErrorEvent *e)
@@ -17,16 +13,7 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
   return 0;
 }
 
-void onMapRequest(const XMapRequestEvent &evt) { }
-
-void handleMap(Display *d, Window w)
-{
-  FrameWindow f(d, w);
-}
-
-
-// Run
-int runWindowManager()
+void WindowManager::run()
 {
   Display *display = XOpenDisplay(nullptr);
   if (display == nullptr) {
@@ -82,10 +69,10 @@ int runWindowManager()
         changes.x = 300;
         changes.y = 60;
         changes.border_width = 0;
-        
+
         XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
 
-        handleMap(evt.xmaprequest.display, evt.xmaprequest.window);
+        handleMapRequest(evt.xmaprequest);
 
         XMapWindow(display, evt.xmaprequest.window);
 
@@ -101,6 +88,9 @@ int runWindowManager()
 
   XCloseDisplay(display);
   std::cout << "Closing Window Manager...\n";
+}
 
-  return EXIT_SUCCESS;
+void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
+{
+  FrameWindow f(evt.display, evt.window);
 }
