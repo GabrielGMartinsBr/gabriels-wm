@@ -5,6 +5,7 @@
 #include <stdexcept>
 
 #include "./utils/codes.h"
+#include "./FrameWindow.h"
 
 // Error Handler
 int onWindowManagerDetected(Display *display, XErrorEvent *e)
@@ -17,6 +18,12 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
 }
 
 void onMapRequest(const XMapRequestEvent &evt) { }
+
+void handleMap(Display *d, Window w)
+{
+  FrameWindow f(d, w);
+}
+
 
 // Run
 int runWindowManager()
@@ -57,8 +64,8 @@ int runWindowManager()
         std::cout << "Received: ConfigureRequest" << '\n';
         XConfigureRequestEvent e = evt.xconfigurerequest;
         XWindowChanges changes;
-        changes.x = 10;
-        changes.y = 10;
+        changes.x = e.x;
+        changes.y = e.y;
         changes.width = e.width;
         changes.height = e.height;
         changes.border_width = 0;
@@ -68,16 +75,23 @@ int runWindowManager()
         XConfigureWindow(display, e.window, e.value_mask | CWX | CWY | CWBorderWidth, &changes);
         break;
       }
+
       case MapRequest: {
         std::cout << "Received: MapRequest" << '\n';
         XWindowChanges changes;
-        changes.x = 10;
-        changes.y = 10;
+        changes.x = 300;
+        changes.y = 60;
         changes.border_width = 0;
+        
         XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
+
+        handleMap(evt.xmaprequest.display, evt.xmaprequest.window);
+
         XMapWindow(display, evt.xmaprequest.window);
+
         break;
       }
+
       default:
         std::cout << "Ignored Event: ";
         std::cout << "[" << evt.type << "] ";
