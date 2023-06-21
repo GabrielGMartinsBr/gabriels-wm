@@ -1,5 +1,8 @@
 #include "./WindowManager.h"
 
+#include <X11/X.h>
+#include <X11/Xlib.h>
+
 #include "./FrameWindow.h"
 #include "./utils/codes.h"
 
@@ -21,7 +24,7 @@ void WindowManager::run()
     throw std::runtime_error("failed to open x display");
   }
 
-  Window rootWindow = DefaultRootWindow(display);
+  rootWindow = DefaultRootWindow(display);
 
   // Try to get window manager events
   long events = SubstructureRedirectMask | SubstructureNotifyMask;
@@ -42,9 +45,6 @@ void WindowManager::run()
         break;
       case ReparentNotify:
         std::cout << "Received: ReparentNotify" << '\n';
-        break;
-      case DestroyNotify:
-        std::cout << "Received: DestroyNotify" << '\n';
         break;
 
       case ConfigureRequest: {
@@ -79,6 +79,16 @@ void WindowManager::run()
         break;
       }
 
+      case UnmapNotify: {
+        unFrame(evt.xunmap);
+        break;
+      }
+
+      case DestroyNotify: {
+        std::cout << "Received: DestroyNotify" << '\n';
+        break;
+      }
+
       default:
         std::cout << "Ignored Event: ";
         std::cout << "[" << evt.type << "] ";
@@ -92,5 +102,24 @@ void WindowManager::run()
 
 void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
 {
+  std::cout << "Frame window\n";
   FrameWindow f(evt.display, evt.window);
+  frames[evt.window] = f.frame;
+}
+
+void WindowManager::unFrame(const XUnmapEvent &evt)
+{
+  std::cout << "unFrame window\n";
+  if (!frames.count(evt.window)) {
+    return;
+  }
+  Window frame = frames[evt.window];
+
+  XUnmapWindow(evt.display, frame);
+
+  XReparentWindow(evt.display, evt.window, rootWindow, 0, 0);
+
+  XDestroyWindow(evt.display, frame);
+
+  frames.erase(evt.window);
 }

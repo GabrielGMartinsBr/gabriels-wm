@@ -21,7 +21,7 @@ FrameWindow::FrameWindow(Display* d, Window w)
   int width = winAttrs.width + borderThick * 2;
   int height = winAttrs.height + topMargin;
 
-  const Window frame = XCreateSimpleWindow(
+  frame = XCreateSimpleWindow(
     d, rootWindow,
     300, 100,
     width, height,

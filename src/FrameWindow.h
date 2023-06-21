@@ -4,5 +4,7 @@
 
 class FrameWindow {
  public:
+  Window frame;
+
   FrameWindow(Display* d, Window w);
 };
