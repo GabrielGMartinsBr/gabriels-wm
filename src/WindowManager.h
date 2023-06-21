@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <unordered_map>
+#include "kit/Button.h"
 
 class WindowManager {
  public:
@@ -13,6 +14,7 @@ class WindowManager {
 
  private:
   std::unordered_map<Window, Window> frames;
+  std::unordered_map<Window, ButtonCb> buttonsCb;
   Window rootWindow;
 
   void handleMapRequest(const XMapRequestEvent &evt);

@@ -3,8 +3,9 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
+#include <iostream>
+
 #include "./FrameWindow.h"
-#include "./utils/codes.h"
 
 // Error Handler
 int onWindowManagerDetected(Display *display, XErrorEvent *e)
@@ -89,10 +90,23 @@ void WindowManager::run()
         break;
       }
 
-      default:
-        std::cout << "Ignored Event: ";
-        std::cout << "[" << evt.type << "] ";
-        std::cout << getEventName(evt) << '\n';
+      case ButtonPress: {
+        std::cout << "Button pressed\n";
+        // std::cout << "rootWindow: " << rootWindow << '\n';
+        // std::cout << "subwindow: " << evt.xbutton.root << '\n';
+        if (buttonsCb.count(evt.xbutton.window)) {
+          std::cout << "window: " << evt.xbutton.window << '\n';
+          buttonsCb[evt.xbutton.window]();
+          // Window tWin = buttonsCb[evt.xbutton.window];
+          // XKillClient(display, tWin);
+        }
+        break;
+      }
+
+        // default:
+        // std::cout << "Ignored Event: ";
+        // std::cout << "[" << evt.type << "] ";
+        // std::cout << getEventName(evt) << '\n';
     }
   }
 
@@ -103,8 +117,9 @@ void WindowManager::run()
 void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
 {
   std::cout << "Frame window\n";
-  FrameWindow f(evt.display, evt.window);
-  frames[evt.window] = f.frame;
+  FrameWindow frame(evt.display, evt.window, &buttonsCb);
+  std::cout << "FrameWind: " << frame.window << '\n';
+  frames[evt.window] = frame.window;
 }
 
 void WindowManager::unFrame(const XUnmapEvent &evt)
