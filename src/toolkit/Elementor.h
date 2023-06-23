@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Button.h"
 #include "Central.h"
 
@@ -7,7 +9,7 @@ struct Elementor {
 
   static void init();
 
-  static Button button(
+  static Button* button(
     Window parent,
     int x, int y,
     int w, int h,

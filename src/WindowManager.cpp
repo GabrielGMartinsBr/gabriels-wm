@@ -1,11 +1,12 @@
-#include "./WindowManager.h"
+#include "WindowManager.h"
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
 #include <iostream>
 
-#include "./FrameWindow.h"
+#include "FrameWindow.h"
+#include "toolkit/Elementor.h"
 
 // TODO: Get win attrs is duplicate on window frame
 // TODO: Refactor event switch statement
@@ -122,10 +123,11 @@ void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
     XSetWindowBorderWidth(d, window, 0);
   }
 
-  FrameWindow frame(d, window);
-  frames[window] = frame.frameWindow;
+  FrameWindow *frame = new FrameWindow(d, window);
+  frames[window] = frame->frameWindow;
+  framesMap[window] = frame;
 
-  std::cout << "FrameWindow: " << frame.frameWindow << " | "
+  std::cout << "FrameWindow: " << frame->frameWindow << " | "
             << "FramedWindow: " << window << '\n';
 }
 

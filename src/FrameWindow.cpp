@@ -1,13 +1,12 @@
 #include "./FrameWindow.h"
-
-#include <X11/X.h>
 #include <X11/Xlib.h>
 
-#include <iostream>
+#include "toolkit/Elementor.h"
 
 FrameWindow::FrameWindow(
-  Display* d, Window contentWindow
-)
+  Display* d, Window cWindow
+) :
+    maximized(false)
 {
   const unsigned int BORDER_WIDTH = 0;
   const unsigned long BORDER_COLOR = 0xff0000;
@@ -16,7 +15,7 @@ FrameWindow::FrameWindow(
   Window rootWindow = DefaultRootWindow(d);
 
   XWindowAttributes winAttrs;
-  XGetWindowAttributes(d, contentWindow, &winAttrs);
+  XGetWindowAttributes(d, cWindow, &winAttrs);
 
   const int headerHeight = 24;
   const int borderThick = 3;
@@ -32,33 +31,46 @@ FrameWindow::FrameWindow(
     BORDER_WIDTH, BORDER_COLOR, BG_COLOR
   );
 
+  contentWindow = cWindow;
+
   long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask;
   XSelectInput(d, frameWindow, evtMasks);
 
-  XReparentWindow(d, contentWindow, frameWindow, borderThick, headerHeight);
+  XReparentWindow(d, cWindow, frameWindow, borderThick, headerHeight);
 
   XMapWindow(d, frameWindow);
 
-  Button closeButton = Elementor::button(
+  closeButton = Elementor::button(
     frameWindow, width - 15, 6, 10, 10,
     0xff0000
   );
-  closeButton.onClick([=]() {
-    XKillClient(d, contentWindow);
+  closeButton->onClick([=]() {
+    XKillClient(d, cWindow);
   });
 
-
-  Button maximizeBtn = Elementor::button(
+  maximizeButton = Elementor::button(
     frameWindow, width - 30, 6, 10, 10,
     0x00ff00
   );
-  Window frameWindowId = frameWindow;
-  maximizeBtn.onClick([=]() {
-    Elementor::central.maximizeWindow(frameWindowId, contentWindow);
+  maximizeButton->onClick([this]() {
+    maximize();
   });
-
-  Button minimizeBtn = Elementor::button(
+  minimizeButton = Elementor::button(
     frameWindow, width - 45, 6, 10, 10,
     0xffff00
   );
+}
+
+void FrameWindow::maximize()
+{
+  Elementor::central.maximizeWindow(frameWindow, contentWindow);
+
+  XWindowAttributes winAttrs;
+  XGetWindowAttributes(Elementor::central.display, Elementor::central.rootWindow, &winAttrs);
+  int width = winAttrs.width;
+  XMoveWindow(Elementor::central.display, closeButton->window, width - 15, 6 );
+  XMoveWindow(Elementor::central.display, maximizeButton->window, width - 30, 6 );
+  XMoveWindow(Elementor::central.display, minimizeButton->window, width - 45, 6 );
+
+  maximized = true;
 }

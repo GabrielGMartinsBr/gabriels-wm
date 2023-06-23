@@ -10,7 +10,7 @@ void Elementor::init()
   central.init();
 }
 
-Button Elementor::button(
+Button *Elementor::button(
   Window parent,
   int x, int y,
   int w, int h,
@@ -18,7 +18,7 @@ Button Elementor::button(
   unsigned long borderColor
 )
 {
-  Button button(
+  Button *button = new Button(
     &central,
     parent, x, y, w, h,
     bgColor, borderColor
