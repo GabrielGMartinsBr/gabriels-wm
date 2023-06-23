@@ -1,13 +1,16 @@
 #pragma once
 
-#include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/extensions/shape.h>
+#include <cairo/cairo-xlib.h>
+
+#include <cmath>
 
 #include "Central.h"
 
 class Button {
  public:
-  Window window;
+  Window win;
 
   Button(
     Central* central,

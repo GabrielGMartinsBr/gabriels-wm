@@ -41,7 +41,7 @@ FrameWindow::FrameWindow(
   XMapWindow(d, frameWindow);
 
   closeButton = Elementor::button(
-    frameWindow, width - 15, 6, 10, 10,
+    frameWindow, width - 15, 6, 12, 12,
     0xff0000
   );
   closeButton->onClick([=]() {
@@ -49,14 +49,14 @@ FrameWindow::FrameWindow(
   });
 
   maximizeButton = Elementor::button(
-    frameWindow, width - 30, 6, 10, 10,
+    frameWindow, width - 30, 6, 12, 12,
     0x00ff00
   );
   maximizeButton->onClick([this]() {
     maximize();
   });
   minimizeButton = Elementor::button(
-    frameWindow, width - 45, 6, 10, 10,
+    frameWindow, width - 45, 6, 12, 12,
     0xffff00
   );
 }
@@ -68,9 +68,9 @@ void FrameWindow::maximize()
   XWindowAttributes winAttrs;
   XGetWindowAttributes(Elementor::central.display, Elementor::central.rootWindow, &winAttrs);
   int width = winAttrs.width;
-  XMoveWindow(Elementor::central.display, closeButton->window, width - 15, 6 );
-  XMoveWindow(Elementor::central.display, maximizeButton->window, width - 30, 6 );
-  XMoveWindow(Elementor::central.display, minimizeButton->window, width - 45, 6 );
+  XMoveWindow(Elementor::central.display, closeButton->win, width - 15, 6 );
+  XMoveWindow(Elementor::central.display, maximizeButton->win, width - 30, 6 );
+  XMoveWindow(Elementor::central.display, minimizeButton->win, width - 45, 6 );
 
   maximized = true;
 }

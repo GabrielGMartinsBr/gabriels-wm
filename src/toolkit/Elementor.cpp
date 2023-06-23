@@ -2,7 +2,6 @@
 
 #include <X11/Xlib.h>
 #include <cairo/cairo-xlib.h>
-#include <cairo/cairo.h>
 #include <math.h>
 
 #include "Button.h"
@@ -51,44 +50,40 @@ Window Elementor::testWindow()
   );
   XMapWindow(display, window);
 
-  int diameter = 16;
+  int diameter = 12;
   int resolution = 720;
   int pixMapWidth = (diameter * resolution) / 72;
   int pixMapHeight = pixMapWidth;
 
-
-  Pixmap pixMap = XCreatePixmap(display, window, pixMapWidth, pixMapHeight, DefaultDepth(display, screen));
+  Pixmap pixMap = XCreatePixmap(display, window, diameter + 2, diameter + 2, DefaultDepth(display, screen));
   GC gc = XCreateGC(display, pixMap, 0, nullptr);
-
 
   // ==========================
 
-  Drawable da = pixMap;
-  cairo_surface_t *sfc;
+  // Drawable da = pixMap;
+  // cairo_surface_t *sfc;
 
-  auto visual = DefaultVisual(display, screen);
-  sfc = cairo_xlib_surface_create(
-    display, da, visual, 60, 60
-  );
-  // cairo_xlib_surface_set_size(sfc, 100, 100);
-  cairo_t *cr = cairo_create(sfc);
+  // auto visual = DefaultVisual(display, screen);
+  // sfc = cairo_xlib_surface_create(
+  //   display, da, visual, 60, 60
+  // );
+  // // cairo_xlib_surface_set_size(sfc, 100, 100);
+  // cairo_t *cr = cairo_create(sfc);
 
-  int d = 12;
+  // int d = 12;
 
-  cairo_set_source_rgb(cr, .9, .9, .9);
-  cairo_set_line_width(cr, 2);
+  // cairo_set_source_rgb(cr, .9, .9, .9);
+  // // cairo_set_line_width(cr, 2);
 
-  cairo_arc(cr, 30, 30, d / 2.0, 0.0, 2 * M_PI);
-  // cairo_stroke(cr);
-  cairo_fill(cr);
+  // cairo_arc(cr, 30, 30, d / 2.0, 0.0, 2 * M_PI);
+  // // cairo_stroke(cr);
+  // cairo_fill(cr);
 
   // cairo_rectangle(cr, 20, 20, 50, 50);
   // cairo_stroke(cr);
 
   // ==========================
   // XClearWindow(display, rootWindow);
-
-  
 
   // XSetForeground(display, gc, 0xdddddd);
   // XFillRectangle(display, pixMap, gc, 0, 0, pixMapWidth, pixMapHeight);
@@ -98,7 +93,19 @@ Window Elementor::testWindow()
   // int cy = (pixMapHeight - diameter) / 2;
   // XFillArc(display, pixMap, gc, cx, cy, diameter, diameter, 0, 360 * 64);
 
-  XCopyArea(display, pixMap, window, gc, 0, 0, pixMapWidth, pixMapHeight, 10, 10);
+  // ===========
+  auto visual = DefaultVisual(display, screen);
+  cairo_surface_t *sfc = cairo_xlib_surface_create(
+    display, pixMap, visual, 60, 60
+  );
+  cairo_t *cr = cairo_create(sfc);
+  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+  float r = diameter / 2.0;
+  cairo_arc(cr, r + 1, r + 1, r, 0.0, 2 * M_PI);
+  cairo_fill(cr);
+  // ===========
+
+  XCopyArea(display, pixMap, window, gc, 0, 0, diameter + 2, diameter + 2, 1, 1);
   XFlush(display);
 
   return window;
