@@ -39,6 +39,9 @@ void WindowManager::run()
 
   XEvent evt;
 
+  auto testWin = Elementor::testWindow();
+  // addWindowFrame(testWin);
+
   while (true) {
     XNextEvent(display, &evt);
 

@@ -1,6 +1,8 @@
 #include "./Button.h"
 
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/shape.h>
 
 #include <iostream>
 
@@ -16,7 +18,7 @@ Button::Button(
   central = c;
   Display* display = central->display;
   window = XCreateSimpleWindow(
-    display, parent, x, y, w, h, 1,
+    display, parent, x, y, w, h, 0,
     borderColor, bgColor
   );
 
