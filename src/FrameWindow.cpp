@@ -25,7 +25,7 @@ FrameWindow::FrameWindow(
 
   window = XCreateSimpleWindow(
     d, rootWindow,
-    300, 100,
+    winAttrs.x, winAttrs.y,
     width, height,
     BORDER_WIDTH, BORDER_COLOR, BG_COLOR
   );
@@ -53,5 +53,4 @@ FrameWindow::FrameWindow(
     window, width - 45, 6, 10, 10,
     0xffff00
   );
-
 }

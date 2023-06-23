@@ -15,7 +15,9 @@ class WindowManager {
   std::unordered_map<Window, Window> frames;
   Window rootWindow;
 
-  void handleMapRequest(const XMapRequestEvent &evt);
+  void addWindowFrame(Window window, Bool isPreExisting = false);
 
   void unFrame(const XUnmapEvent &evt);
+
+  void getPreExistingWindows();
 };

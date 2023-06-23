@@ -7,6 +7,10 @@
 
 #include "./FrameWindow.h"
 
+// TODO: Get win attrs is duplicate on window frame
+// TODO: Refactor event switch statement
+// TODO:
+
 // Error Handler
 int onWindowManagerDetected(Display *display, XErrorEvent *e)
 {
@@ -30,6 +34,8 @@ void WindowManager::run()
 
   std::cout << "Window Manager has been init!\n";
 
+  getPreExistingWindows();
+
   XEvent evt;
 
   while (true) {
@@ -37,14 +43,14 @@ void WindowManager::run()
 
     switch (evt.type) {
       case CreateNotify:
-        // std::cout << "Received: CreateNotify" << '\n';
+        std::cout << "CreateNotify:" << evt.xcreatewindow.window << '\n';
         break;
       case ReparentNotify:
         // std::cout << "Received: ReparentNotify" << '\n';
         break;
 
       case ConfigureRequest: {
-        // std::cout << "Received: ConfigureRequest" << '\n';
+        std::cout << "ConfigureRequest:" << evt.xconfigurerequest.window << '\n';
         XConfigureRequestEvent e = evt.xconfigurerequest;
         XWindowChanges changes;
         changes.x = e.x;
@@ -58,7 +64,7 @@ void WindowManager::run()
         break;
       }
       case MapRequest: {
-        // std::cout << "Received: MapRequest" << '\n';
+        std::cout << "MapRequest:" << evt.xmaprequest.window << '\n';
         XWindowChanges changes;
         changes.x = 300;
         changes.y = 60;
@@ -66,7 +72,7 @@ void WindowManager::run()
 
         XConfigureWindow(display, evt.xmaprequest.window, CWX | CWY | CWBorderWidth, &changes);
 
-        handleMapRequest(evt.xmaprequest);
+        addWindowFrame(evt.xmaprequest.window);
 
         XMapWindow(display, evt.xmaprequest.window);
 
@@ -77,7 +83,7 @@ void WindowManager::run()
         break;
       }
       case DestroyNotify: {
-        // std::cout << "Received: DestroyNotify" << '\n';
+        std::cout << "DestroyNotify:" << evt.xdestroywindow.window << '\n';
         break;
       }
       case ButtonPress: {
@@ -98,20 +104,43 @@ void WindowManager::run()
   std::cout << "Closing Window Manager...\n";
 }
 
-void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
+void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
 {
-  FrameWindow frame(evt.display, evt.window);
-  std::cout << "FrameWindow: " << frame.window << '\n';
-  frames[evt.window] = frame.window;
+  Display *d = Elementor::central.display;
+
+  if (isPreExisting) {
+    XWindowAttributes winAttrs;
+    XGetWindowAttributes(d, window, &winAttrs);
+    if (
+      winAttrs.override_redirect
+      || winAttrs.map_state != IsViewable
+    ) {
+      return;
+    }
+
+    XSetWindowBorderWidth(d, window, 0);
+  }
+
+  FrameWindow frame(d, window);
+  frames[window] = frame.window;
+
+  std::cout << "FrameWindow: " << frame.window << " | "
+            << "FramedWindow: " << window << '\n';
 }
 
 void WindowManager::unFrame(const XUnmapEvent &evt)
 {
-  std::cout << "unFrame window: " << evt.window << '\n';
   if (!frames.count(evt.window)) {
     return;
   }
+
+  if (evt.event == rootWindow) {
+    return;
+  }
+
   Window frame = frames[evt.window];
+
+  std::cout << "unFrame window: " << evt.window << '\n';
 
   XUnmapWindow(evt.display, frame);
 
@@ -120,4 +149,30 @@ void WindowManager::unFrame(const XUnmapEvent &evt)
   XDestroyWindow(evt.display, frame);
 
   frames.erase(evt.window);
+}
+
+void WindowManager::getPreExistingWindows()
+{
+  Display *d = Elementor::central.display;
+  Window root = Elementor::central.rootWindow;
+  XGrabServer(d);
+
+  Window returned_root, returned_parent;
+  Window *top_level_windows;
+  unsigned int num_top_level_windows;
+  XQueryTree(
+    d,
+    root,
+    &returned_root,
+    &returned_parent,
+    &top_level_windows,
+    &num_top_level_windows
+  );
+
+  for (unsigned int i = 0; i < num_top_level_windows; ++i) {
+    addWindowFrame(top_level_windows[i], true);
+  }
+
+  XFree(top_level_windows);
+  XUngrabServer(d);
 }
