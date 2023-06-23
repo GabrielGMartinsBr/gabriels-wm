@@ -28,7 +28,7 @@ void WindowManager::run()
   XSetErrorHandler(&onWindowManagerDetected);
   XSync(display, false);
 
-  std::cout << "Window Manager opened!\n";
+  std::cout << "Window Manager has been init!\n";
 
   XEvent evt;
 
@@ -54,11 +54,9 @@ void WindowManager::run()
         changes.border_width = 0;
         changes.sibling = e.above;
         changes.stack_mode = e.detail;
-        std::cout << e.value_mask << '\n';
         XConfigureWindow(display, e.window, e.value_mask | CWX | CWY | CWBorderWidth, &changes);
         break;
       }
-
       case MapRequest: {
         // std::cout << "Received: MapRequest" << '\n';
         XWindowChanges changes;
@@ -74,20 +72,18 @@ void WindowManager::run()
 
         break;
       }
-
       case UnmapNotify: {
         unFrame(evt.xunmap);
         break;
       }
-
       case DestroyNotify: {
         // std::cout << "Received: DestroyNotify" << '\n';
         break;
       }
-
       case ButtonPress: {
-        std::cout << "Button pressed\n";
-        Elementor::central.handleButtonClickEvent(evt.xbutton);
+        Elementor::central.handleButtonClickEvent(
+          evt.xbutton
+        );
         break;
       }
 
@@ -104,15 +100,14 @@ void WindowManager::run()
 
 void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
 {
-  std::cout << "Frame window\n";
   FrameWindow frame(evt.display, evt.window);
-  std::cout << "FrameWind: " << frame.window << '\n';
+  std::cout << "FrameWindow: " << frame.window << '\n';
   frames[evt.window] = frame.window;
 }
 
 void WindowManager::unFrame(const XUnmapEvent &evt)
 {
-  std::cout << "unFrame window\n";
+  std::cout << "unFrame window: " << evt.window << '\n';
   if (!frames.count(evt.window)) {
     return;
   }

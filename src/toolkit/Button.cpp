@@ -1,5 +1,7 @@
 #include "./Button.h"
 
+#include <X11/Xlib.h>
+
 #include <iostream>
 
 Button::Button(
@@ -10,13 +12,22 @@ Button::Button(
 )
 {
   central = c;
-  Display* d = central->display;
+  Display* display = central->display;
   window = XCreateSimpleWindow(
-    d, parent, x, y, w, h, 1,
-    BlackPixel(d, DefaultScreen(d)), WhitePixel(d, DefaultScreen(d))
+    display, parent, x, y, w, h, 1,
+    0x000000, 0xffffff
   );
-  XSelectInput(d, window, ButtonPressMask | ButtonReleaseMask);
-  XMapWindow(d, window);
+
+  XSelectInput(display, window, ButtonPressMask | ButtonReleaseMask);
+  XMapWindow(display, window);
+}
+
+void Button::setBackground(unsigned long color)
+{
+  XSetWindowAttributes attributes;
+  attributes.background_pixel = color;
+  XChangeWindowAttributes(central->display, window, CWBackPixel, &attributes);
+  XClearWindow(central->display, window);
 }
 
 void Button::onClick(const ButtonCallback& cb)

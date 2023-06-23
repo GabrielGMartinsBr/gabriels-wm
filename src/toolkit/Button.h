@@ -18,6 +18,8 @@ class Button {
 
   void onClick(const ButtonCallback& cb);
 
+  void setBackground(unsigned long color);
+
  private:
   Central* central;
 };

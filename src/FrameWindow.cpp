@@ -40,6 +40,7 @@ FrameWindow::FrameWindow(
   Button closeButton = Elementor::button(
     window, width - 15, 6, 10, 10
   );
+  closeButton.setBackground(0xff0000);
   closeButton.onClick([=]() {
     XKillClient(d, w);
   });
@@ -47,11 +48,10 @@ FrameWindow::FrameWindow(
   Button maximizeBtn = Elementor::button(
     window, width - 30, 6, 10, 10
   );
+  maximizeBtn.setBackground(0x00ff00);
   Button minimizeBtn = Elementor::button(
     window, width - 45, 6, 10, 10
   );
-}
+  minimizeBtn.setBackground(0xffff00);
 
-void FrameWindow::close()
-{
 }

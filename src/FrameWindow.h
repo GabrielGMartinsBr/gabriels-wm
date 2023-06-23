@@ -13,7 +13,4 @@ class FrameWindow {
   FrameWindow(
     Display* d, Window w
   );
-
- private:
-  void close();
 };
