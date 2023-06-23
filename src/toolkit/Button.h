@@ -13,7 +13,9 @@ class Button {
     Central* central,
     const Window parent,
     int x, int y,
-    int w, int h
+    int w, int h,
+    unsigned long bgColor = 0xffffff,
+    unsigned long borderColor = 0x000000
   );
 
   void onClick(const ButtonCallback& cb);

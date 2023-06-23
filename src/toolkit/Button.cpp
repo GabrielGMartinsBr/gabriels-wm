@@ -8,14 +8,16 @@ Button::Button(
   Central* c,
   const Window parent,
   int x, int y,
-  int w, int h
+  int w, int h,
+  unsigned long bgColor,
+  unsigned long borderColor
 )
 {
   central = c;
   Display* display = central->display;
   window = XCreateSimpleWindow(
     display, parent, x, y, w, h, 1,
-    0x000000, 0xffffff
+    borderColor, bgColor
   );
 
   XSelectInput(display, window, ButtonPressMask | ButtonReleaseMask);

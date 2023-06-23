@@ -13,12 +13,15 @@ void Elementor::init()
 Button Elementor::button(
   Window parent,
   int x, int y,
-  int w, int h
+  int w, int h,
+  unsigned long bgColor,
+  unsigned long borderColor
 )
 {
   Button button(
     &central,
-    parent, x, y, w, h
+    parent, x, y, w, h,
+    bgColor, borderColor
   );
   return button;
 }
