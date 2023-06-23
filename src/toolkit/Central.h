@@ -18,6 +18,8 @@ struct Central {
 
   void handleButtonClickEvent(XButtonEvent event);
 
+  void maximizeWindow(Window frameWindow, Window contentWindow);
+
  private:
   std::unordered_map<Window, ButtonCallback> buttonCallbacks;
 };

@@ -3,8 +3,10 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
+#include <iostream>
+
 FrameWindow::FrameWindow(
-  Display* d, Window w
+  Display* d, Window contentWindow
 )
 {
   const unsigned int BORDER_WIDTH = 0;
@@ -14,7 +16,7 @@ FrameWindow::FrameWindow(
   Window rootWindow = DefaultRootWindow(d);
 
   XWindowAttributes winAttrs;
-  XGetWindowAttributes(d, w, &winAttrs);
+  XGetWindowAttributes(d, contentWindow, &winAttrs);
 
   const int headerHeight = 24;
   const int borderThick = 3;
@@ -23,7 +25,7 @@ FrameWindow::FrameWindow(
   int width = winAttrs.width + borderThick * 2;
   int height = winAttrs.height + topMargin;
 
-  window = XCreateSimpleWindow(
+  frameWindow = XCreateSimpleWindow(
     d, rootWindow,
     winAttrs.x, winAttrs.y,
     width, height,
@@ -31,26 +33,32 @@ FrameWindow::FrameWindow(
   );
 
   long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask;
-  XSelectInput(d, window, evtMasks);
+  XSelectInput(d, frameWindow, evtMasks);
 
-  XReparentWindow(d, w, window, borderThick, headerHeight);
+  XReparentWindow(d, contentWindow, frameWindow, borderThick, headerHeight);
 
-  XMapWindow(d, window);
+  XMapWindow(d, frameWindow);
 
   Button closeButton = Elementor::button(
-    window, width - 15, 6, 10, 10,
+    frameWindow, width - 15, 6, 10, 10,
     0xff0000
   );
   closeButton.onClick([=]() {
-    XKillClient(d, w);
+    XKillClient(d, contentWindow);
   });
 
+
   Button maximizeBtn = Elementor::button(
-    window, width - 30, 6, 10, 10,
+    frameWindow, width - 30, 6, 10, 10,
     0x00ff00
   );
+  Window frameWindowId = frameWindow;
+  maximizeBtn.onClick([=]() {
+    Elementor::central.maximizeWindow(frameWindowId, contentWindow);
+  });
+
   Button minimizeBtn = Elementor::button(
-    window, width - 45, 6, 10, 10,
+    frameWindow, width - 45, 6, 10, 10,
     0xffff00
   );
 }

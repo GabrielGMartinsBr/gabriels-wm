@@ -79,6 +79,7 @@ void WindowManager::run()
         break;
       }
       case UnmapNotify: {
+        std::cout << "UnmapNotify: " << evt.xunmap.window << '\n';
         unFrame(evt.xunmap);
         break;
       }
@@ -122,9 +123,9 @@ void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
   }
 
   FrameWindow frame(d, window);
-  frames[window] = frame.window;
+  frames[window] = frame.frameWindow;
 
-  std::cout << "FrameWindow: " << frame.window << " | "
+  std::cout << "FrameWindow: " << frame.frameWindow << " | "
             << "FramedWindow: " << window << '\n';
 }
 

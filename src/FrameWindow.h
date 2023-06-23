@@ -8,7 +8,8 @@
 
 class FrameWindow {
  public:
-  Window window;
+  Window frameWindow;
+  Bool maximized;
 
   FrameWindow(
     Display* d, Window w

@@ -1,5 +1,9 @@
 #include "./Central.h"
 
+#include <X11/Xlib.h>
+
+#include <iostream>
+
 void Central::init()
 {
   display = XOpenDisplay(nullptr);
@@ -21,4 +25,22 @@ void Central::handleButtonClickEvent(XButtonEvent event)
   if (hasCallback) {
     buttonCallbacks[windowId]();
   }
+}
+
+void Central::maximizeWindow(Window frameWindow, Window contentWindow)
+{
+  const int headerHeight = 24;
+  const int borderThick = 3;
+  int topMargin = headerHeight + borderThick;
+
+  XWindowAttributes winAttrs;
+  XGetWindowAttributes(display, rootWindow, &winAttrs);
+
+  int width = winAttrs.width;
+  int height = winAttrs.height;
+  int contentWidth = width - borderThick * 2;
+  int contentHeight = height - topMargin;
+
+  XMoveResizeWindow(display, frameWindow, 0, 0, width, height);
+  XResizeWindow(display, contentWindow, contentWidth, contentHeight);
 }
