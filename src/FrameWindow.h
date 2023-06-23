@@ -4,15 +4,14 @@
 
 #include <unordered_map>
 
-#include "kit/Button.h"
+#include "toolkit/Elementor.h"
 
 class FrameWindow {
  public:
   Window window;
 
   FrameWindow(
-    Display* d, Window w,
-    std::unordered_map<Window, ButtonCb>* buttonsCb
+    Display* d, Window w
   );
 
  private:

@@ -19,13 +19,8 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
 
 void WindowManager::run()
 {
-  Display *display = XOpenDisplay(nullptr);
-  if (display == nullptr) {
-    // Could not establish a connection with x server
-    throw std::runtime_error("failed to open x display");
-  }
-
-  rootWindow = DefaultRootWindow(display);
+  Display *display = Elementor::central.display;
+  rootWindow = Elementor::central.rootWindow;
 
   // Try to get window manager events
   long events = SubstructureRedirectMask | SubstructureNotifyMask;
@@ -42,14 +37,14 @@ void WindowManager::run()
 
     switch (evt.type) {
       case CreateNotify:
-        std::cout << "Received: CreateNotify" << '\n';
+        // std::cout << "Received: CreateNotify" << '\n';
         break;
       case ReparentNotify:
-        std::cout << "Received: ReparentNotify" << '\n';
+        // std::cout << "Received: ReparentNotify" << '\n';
         break;
 
       case ConfigureRequest: {
-        std::cout << "Received: ConfigureRequest" << '\n';
+        // std::cout << "Received: ConfigureRequest" << '\n';
         XConfigureRequestEvent e = evt.xconfigurerequest;
         XWindowChanges changes;
         changes.x = e.x;
@@ -65,7 +60,7 @@ void WindowManager::run()
       }
 
       case MapRequest: {
-        std::cout << "Received: MapRequest" << '\n';
+        // std::cout << "Received: MapRequest" << '\n';
         XWindowChanges changes;
         changes.x = 300;
         changes.y = 60;
@@ -86,20 +81,13 @@ void WindowManager::run()
       }
 
       case DestroyNotify: {
-        std::cout << "Received: DestroyNotify" << '\n';
+        // std::cout << "Received: DestroyNotify" << '\n';
         break;
       }
 
       case ButtonPress: {
         std::cout << "Button pressed\n";
-        // std::cout << "rootWindow: " << rootWindow << '\n';
-        // std::cout << "subwindow: " << evt.xbutton.root << '\n';
-        if (buttonsCb.count(evt.xbutton.window)) {
-          std::cout << "window: " << evt.xbutton.window << '\n';
-          buttonsCb[evt.xbutton.window]();
-          // Window tWin = buttonsCb[evt.xbutton.window];
-          // XKillClient(display, tWin);
-        }
+        Elementor::central.handleButtonClickEvent(evt.xbutton);
         break;
       }
 
@@ -117,7 +105,7 @@ void WindowManager::run()
 void WindowManager::handleMapRequest(const XMapRequestEvent &evt)
 {
   std::cout << "Frame window\n";
-  FrameWindow frame(evt.display, evt.window, &buttonsCb);
+  FrameWindow frame(evt.display, evt.window);
   std::cout << "FrameWind: " << frame.window << '\n';
   frames[evt.window] = frame.window;
 }

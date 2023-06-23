@@ -1,9 +1,11 @@
-#include "./WindowManager.h"
+#include "WindowManager.h"
+#include "toolkit/Elementor.h"
 
 int main(int, char **)
 {
-  WindowManager wm;
+  Elementor::init();
 
+  WindowManager wm;
   wm.run();
 
   return 0;

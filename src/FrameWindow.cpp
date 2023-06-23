@@ -3,11 +3,8 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
-#include "./kit/Button.h"
-
 FrameWindow::FrameWindow(
-  Display* d, Window w,
-  std::unordered_map<Window, ButtonCb>* buttonsCb
+  Display* d, Window w
 )
 {
   const unsigned int BORDER_WIDTH = 0;
@@ -40,18 +37,19 @@ FrameWindow::FrameWindow(
 
   XMapWindow(d, window);
 
-  Button closeBtn(d, window, width - 15, 6, 10, 10);
-  Button maximizeBtn(d, window, width - 30, 6, 10, 10);
-  Button minimizeBtn(d, window, width - 45, 6, 10, 10);
-
-  auto buttonCallback = [d, w]() {
-  };
-
-  auto closeCb = [=]() {
+  Button closeButton = Elementor::button(
+    window, width - 15, 6, 10, 10
+  );
+  closeButton.onClick([=]() {
     XKillClient(d, w);
-  };
+  });
 
-  (*buttonsCb)[closeBtn.window] = closeCb;
+  Button maximizeBtn = Elementor::button(
+    window, width - 30, 6, 10, 10
+  );
+  Button minimizeBtn = Elementor::button(
+    window, width - 45, 6, 10, 10
+  );
 }
 
 void FrameWindow::close()
