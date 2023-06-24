@@ -2,6 +2,7 @@
 
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <X11/cursorfont.h>
 
 #include <iostream>
 
@@ -26,6 +27,9 @@ void WindowManager::run()
 {
   Display *display = Elementor::central.display;
   rootWindow = Elementor::central.rootWindow;
+
+  Cursor cursor = XCreateFontCursor(display, XC_arrow);
+  XDefineCursor(display, rootWindow, cursor);
 
   // Try to get window manager events
   long events = SubstructureRedirectMask | SubstructureNotifyMask;
