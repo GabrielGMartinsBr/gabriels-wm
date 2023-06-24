@@ -130,7 +130,7 @@ void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
     XSetWindowBorderWidth(d, window, 0);
   }
 
-  FrameWindow *frame = new FrameWindow(d, window);
+  FrameWindow *frame = new FrameWindow(&Elementor::central, window);
   frames[window] = frame->frameWindow;
   framesMap[window] = frame;
 

@@ -2,24 +2,40 @@
 
 #include <X11/Xlib.h>
 
-#include <unordered_map>
-
 #include "toolkit/Button.h"
+#include "toolkit/Central.h"
 
 class FrameWindow {
  public:
+  static const int topHeight = 24;
+  static const int borderWidth = 3;
+  static const unsigned long bgColor = 0x3f7faf;
+
+  int x;
+  int y;
+  int width;
+  int height;
+  bool maximized;
+
   Window frameWindow;
   Window contentWindow;
-  Bool maximized;
 
   FrameWindow(
-    Display *d, Window w
+    Central *ct,
+    Window w
   );
 
+  void handleMaximizeClick();
   void maximize();
+  void restoreSize();
 
  private:
+  Central *central;
+  Display *display;
+
   Button *closeButton;
   Button *maximizeButton;
   Button *minimizeButton;
+
+  void updateButtonsPosition();
 };

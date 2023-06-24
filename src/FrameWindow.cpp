@@ -1,76 +1,100 @@
 #include "./FrameWindow.h"
-#include <X11/Xlib.h>
 
 #include "toolkit/Elementor.h"
 
 FrameWindow::FrameWindow(
-  Display* d, Window cWindow
+  Central* ct,
+  Window cWin
 ) :
     maximized(false)
 {
-  const unsigned int BORDER_WIDTH = 0;
-  const unsigned long BORDER_COLOR = 0xff0000;
-  const unsigned long BG_COLOR = 0x3f7faf;
-
-  Window rootWindow = DefaultRootWindow(d);
+  central = ct;
+  display = ct->display;
+  contentWindow = cWin;
 
   XWindowAttributes winAttrs;
-  XGetWindowAttributes(d, cWindow, &winAttrs);
+  XGetWindowAttributes(display, cWin, &winAttrs);
 
-  const int headerHeight = 24;
-  const int borderThick = 3;
-  int topMargin = headerHeight + borderThick;
-
-  int width = winAttrs.width + borderThick * 2;
-  int height = winAttrs.height + topMargin;
+  x = winAttrs.x;
+  y = winAttrs.y;
+  width = winAttrs.width + borderWidth * 2;
+  height = winAttrs.height + topHeight + borderWidth;
 
   frameWindow = XCreateSimpleWindow(
-    d, rootWindow,
-    winAttrs.x, winAttrs.y,
-    width, height,
-    BORDER_WIDTH, BORDER_COLOR, BG_COLOR
+    display, central->rootWindow,
+    x, y, width, height,
+    0, 0, bgColor
   );
 
-  contentWindow = cWindow;
-
   long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask;
-  XSelectInput(d, frameWindow, evtMasks);
+  XSelectInput(display, frameWindow, evtMasks);
 
-  XReparentWindow(d, cWindow, frameWindow, borderThick, headerHeight);
+  XReparentWindow(display, cWin, frameWindow, borderWidth, topHeight);
 
-  XMapWindow(d, frameWindow);
+  XMapWindow(display, frameWindow);
 
   closeButton = Elementor::button(
     frameWindow, width - 15, 6, 12, 12,
-    0xff0000
+    0xff4030
   );
   closeButton->onClick([=]() {
-    XKillClient(d, cWindow);
+    XKillClient(display, cWin);
   });
 
   maximizeButton = Elementor::button(
-    frameWindow, width - 30, 6, 12, 12,
-    0x00ff00
+    frameWindow, width - 31, 6, 12, 12,
+    0x00df30
   );
   maximizeButton->onClick([this]() {
-    maximize();
+    handleMaximizeClick();
   });
   minimizeButton = Elementor::button(
-    frameWindow, width - 45, 6, 12, 12,
-    0xffff00
+    frameWindow, width - 47, 6, 12, 12,
+    0xefdf00
   );
+}
+
+void FrameWindow::handleMaximizeClick()
+{
+  if (maximized) {
+    restoreSize();
+  } else {
+    maximize();
+  }
 }
 
 void FrameWindow::maximize()
 {
-  Elementor::central.maximizeWindow(frameWindow, contentWindow);
-
   XWindowAttributes winAttrs;
-  XGetWindowAttributes(Elementor::central.display, Elementor::central.rootWindow, &winAttrs);
-  int width = winAttrs.width;
-  XMoveWindow(Elementor::central.display, closeButton->win, width - 15, 6 );
-  XMoveWindow(Elementor::central.display, maximizeButton->win, width - 30, 6 );
-  XMoveWindow(Elementor::central.display, minimizeButton->win, width - 45, 6 );
-
+  XGetWindowAttributes(display, central->rootWindow, &winAttrs);
+  int contentWidth = winAttrs.width - borderWidth * 2;
+  int contentHeight = winAttrs.height - topHeight;
+  XMoveResizeWindow(display, frameWindow, 0, 0, winAttrs.width, winAttrs.height);
+  XResizeWindow(display, contentWindow, contentWidth, contentHeight);
   maximized = true;
+  updateButtonsPosition();
+}
+
+void FrameWindow::restoreSize()
+{
+  int cWidth = width - borderWidth * 2;
+  int cHeight = height - topHeight - borderWidth;
+  XMoveResizeWindow(display, frameWindow, x, y, width, height);
+  XResizeWindow(display, contentWindow, cWidth, cHeight);
+  maximized = false;
+  updateButtonsPosition();
+}
+
+void FrameWindow::updateButtonsPosition()
+{
+  int _width = width;
+  if (maximized) {
+    // TODO: add root window dimensions on central
+    XWindowAttributes winAttrs;
+    XGetWindowAttributes(display, central->rootWindow, &winAttrs);
+    _width = winAttrs.width;
+  }
+  XMoveWindow(display, closeButton->win, _width - 15, 6);
+  XMoveWindow(display, maximizeButton->win, _width - 30, 6);
+  XMoveWindow(display, minimizeButton->win, _width - 45, 6);
 }
