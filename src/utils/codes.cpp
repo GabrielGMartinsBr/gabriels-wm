@@ -2,6 +2,9 @@
 
 string getEventName(const XEvent &e)
 {
+  if (e.type > 35) {
+    return "NonXlibEvent";
+  }
   static const char *const X_EVENT_TYPE_NAMES[] = {
     "",
     "",
