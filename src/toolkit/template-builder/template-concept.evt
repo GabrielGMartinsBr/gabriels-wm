@@ -1,0 +1,120 @@
+/**
+ * Elementor Template Concept
+ * .emt = EleMenTor
+ * .elt = ElementorTemplate
+ * .evt = Elementor View Template
+ * .vt = View Template
+ * .elt
+ */
+
+template: {
+   #conceptTemplate;
+   [id]: 'conceptTemplate';
+
+   cont: {
+      [class]: 'row p-3';
+      [style]: 'bgColor: blue';
+      [style.bgColor]: 'blue';
+      [style.bgColor]: '#00f';
+
+      (button1Press): 'handleContPress()';
+      (button1Release): 'handleContRelease()'
+
+      cont: {}
+      
+      cont: {
+         [class]: 'col';
+         cont: {
+            [class]: 'row';
+            
+            button: {
+               // Prop Bind
+               [class]: 'bg-blue p-3';
+               [class]: 'text-base text-black';
+               
+               // Event Listen
+               (button1Press): 'handleContPress()';
+               
+               // Directive
+               &saveRef();
+               
+               image: {
+                  [src]: '@assets/packets.png';
+               }
+               text: {
+                  [class]: 'text-lg text-[#333]';
+                  [value]: 'Programas';
+               }
+            }
+
+            button: {
+               image: { [src]: '@assets/packets.png'; }
+               text: { [value]: 'Programas'; }
+            }
+         }
+
+         cont: {
+            [class]: 'row';
+
+            button: {
+               image: { [src]: '@assets/devices.png'; }
+               text: { [value]: 'Dispositivos'; }
+            }
+            button: {
+               image: { [src]: '@assets/packets.png'; }
+               text: { [value]: 'Programas'; }
+            }
+         }
+      }
+   }
+
+}
+
+
+component: {
+   #component1;
+
+   button: {
+      .row.bg-blue.p-9;
+      [class]: 'row bg-blue p-9';
+      [class]: '
+         row
+         bg-red
+         p-9
+      ';
+      [style] = '
+         direction: row;
+         color: #333;
+         bgColor: red;
+         padding: 9;
+      ';
+
+      (buttonPress): "handleClick()";
+
+      [value]: "Submit"
+   }
+}
+
+maximizeButton: {
+   @src/wm/frame/MaximizeButton.h;
+
+   button: {
+      .row.bg-blue.p-9;
+      [class]: 'row bg-blue p-9';
+      [class]: '
+         row
+         bg-red
+         p-9
+      ';
+      [style] = '
+         direction: row;
+         color: #333;
+         bgColor: red;
+         padding: 9;
+      ';
+
+      (buttonPress): "handleClick()";
+
+      [value]: "Submit"
+   }
+}
