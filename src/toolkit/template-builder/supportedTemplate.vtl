@@ -1,0 +1,18 @@
+template {
+   container {
+      [class]: 'col';
+      
+      text {
+         [class]: 'mb-6';
+         [value]: 'First Template';
+      }
+      
+      button {
+         [class]: 'p-3 bg-gray';
+         (buttonPress): 'handleButtonPress()';
+         text {
+            [value]: 'Execute';
+         }
+      }
+   }
+}
