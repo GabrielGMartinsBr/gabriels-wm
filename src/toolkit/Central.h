@@ -6,18 +6,13 @@
 #include <stdexcept>
 #include <unordered_map>
 
-typedef std::function<void()> ButtonCallback;
+#include "events/EventHandler.h"
 
 struct Central {
   Display *display;
   Window rootWindow;
 
+  EventHandler *eventsHandler;
+
   void init();
-
-  void addButtonClickCallback(const Window windowId, ButtonCallback cb);
-
-  void handleButtonClickEvent(XButtonEvent event);
-
- private:
-  std::unordered_map<Window, ButtonCallback> buttonCallbacks;
 };

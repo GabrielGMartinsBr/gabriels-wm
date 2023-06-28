@@ -1,5 +1,7 @@
 #include "./Button.h"
 
+#include "events/Events.h"
+
 Button::Button(
   Central* c,
   const Window parent,
@@ -48,7 +50,9 @@ void Button::setBackground(unsigned long color)
   XClearWindow(central->display, win);
 }
 
-void Button::onClick(const ButtonCallback& cb)
+void Button::onClick(const EventCallback& cb)
 {
-  central->addButtonClickCallback(win, cb);
+  central->eventsHandler->addEventCb(
+    EventType::BUTTON_PRESS, win, cb
+  );
 }

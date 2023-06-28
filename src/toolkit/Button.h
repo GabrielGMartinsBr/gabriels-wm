@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include "Central.h"
+#include "events/EventHandler.h"
 
 class Button {
  public:
@@ -21,7 +22,7 @@ class Button {
     unsigned long borderColor = 0x000000
   );
 
-  void onClick(const ButtonCallback& cb);
+  void onClick(const EventCallback& cb);
 
   void setBackground(unsigned long color);
 

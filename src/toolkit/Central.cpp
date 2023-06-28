@@ -1,5 +1,7 @@
 #include "./Central.h"
 
+#include "events/EventHandler.h"
+
 void Central::init()
 {
   display = XOpenDisplay(nullptr);
@@ -7,18 +9,7 @@ void Central::init()
     throw std::runtime_error("failed to open x display");
   }
   rootWindow = DefaultRootWindow(display);
+
+  eventsHandler = new EventHandler();
 }
 
-void Central::addButtonClickCallback(const Window windowId, const ButtonCallback cb)
-{
-  buttonCallbacks[windowId] = cb;
-}
-
-void Central::handleButtonClickEvent(XButtonEvent event)
-{
-  const auto windowId = event.window;
-  auto hasCallback = buttonCallbacks.count(windowId);
-  if (hasCallback) {
-    buttonCallbacks[windowId]();
-  }
-}

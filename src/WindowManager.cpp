@@ -142,41 +142,17 @@ void WindowManager::handleReparentNotify(const XReparentEvent event)
 
 void WindowManager::handleButtonPress(const XButtonEvent event)
 {
-  // std::cout << "XButtonEvent:" << event.window << '\n';
-  // std::cout << "Button Press" << '\n';
-  // std::cout << "state:" << event.state << '\n';
-  // std::cout << "button:" << event.button << '\n';
-  // std::cout << "same_screen:" << event.same_screen << '\n';
-  // std::cout << "x:" << event.x << '\n';
-  // std::cout << "y:" << event.y << '\n';
-  // std::cout << "x_root:" << event.x_root << '\n';
-  // std::cout << "y_root:" << event.y_root << '\n';
-
-  if (framesMap.count(event.window)) {
-    FrameWindow *frame = framesMap[event.window];
-    frame->handleButtonEvent(true, event.x, event.y);
-  }
-
-  Elementor::central.handleButtonClickEvent(
-    event
-  );
+  central->eventsHandler->handleButtonPress(event);
 }
 
 void WindowManager::handleButtonRelease(const XButtonEvent event)
 {
-  // std::cout << "Button Release" << '\n';
-  if (framesMap.count(event.window)) {
-    FrameWindow *frame = framesMap[event.window];
-    frame->handleButtonEvent(false, event.x, event.y);
-  }
+  central->eventsHandler->handleButtonRelease(event);
 }
 
 void WindowManager::handleMotionNotify(const XMotionEvent event)
 {
-  if (framesMap.count(event.window)) {
-    FrameWindow *frame = framesMap[event.window];
-    frame->handleMotionEvent(event.x, event.y);
-  }
+  central->eventsHandler->handleMotionNotify(event);
 }
 
 void WindowManager::handleDestroyNotify(const XDestroyWindowEvent event)

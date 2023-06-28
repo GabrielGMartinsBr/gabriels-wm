@@ -3,6 +3,7 @@
 #include <X11/Xlib.h>
 
 #include "toolkit/Elementor.h"
+#include "toolkit/events/Events.h"
 
 FrameWindow::FrameWindow(
   Central* ct,
@@ -41,7 +42,7 @@ FrameWindow::FrameWindow(
     frameWindow, width - 15, 6, 12, 12,
     0xff4030
   );
-  closeButton->onClick([=]() {
+  closeButton->onClick([=](Event e) {
     XKillClient(display, cWin);
   });
 
@@ -49,12 +50,50 @@ FrameWindow::FrameWindow(
     frameWindow, width - 31, 6, 12, 12,
     0x00df30
   );
-  maximizeButton->onClick([this]() {
+
+  auto closeCb = [this](Event e) {
     handleMaximizeClick();
-  });
+  };
+
+  maximizeButton->onClick(closeCb);
   minimizeButton = Elementor::button(
     frameWindow, width - 47, 6, 12, 12,
     0xefdf00
+  );
+
+  central->eventsHandler->addEventCb(
+    EventType::BUTTON_PRESS,
+    minimizeButton->win,
+    [this](Event e) {
+      handleMaximizeClick();
+    }
+  );
+
+  registerEvents();
+}
+
+void FrameWindow::registerEvents()
+{
+  central->eventsHandler->addEventCb(
+    EventType::BUTTON_PRESS,
+    frameWindow,
+    [this](Event e) {
+      handleButtonEvent(true, e.x, e.y);
+    }
+  );
+  central->eventsHandler->addEventCb(
+    EventType::BUTTON_RELEASE,
+    frameWindow,
+    [this](Event e) {
+      handleButtonEvent(false, e.x, e.y);
+    }
+  );
+  central->eventsHandler->addEventCb(
+    EventType::MOTION,
+    frameWindow,
+    [this](Event e) {
+      handleMotionEvent(e.x, e.y);
+    }
   );
 }
 
@@ -73,6 +112,7 @@ void FrameWindow::maximize()
   XGetWindowAttributes(display, central->rootWindow, &winAttrs);
   int contentWidth = winAttrs.width - borderWidth * 2;
   int contentHeight = winAttrs.height - topHeight;
+  XSetWindowBorderWidth(display, frameWindow, 0);
   XMoveResizeWindow(display, frameWindow, 0, 0, winAttrs.width, winAttrs.height);
   XResizeWindow(display, contentWindow, contentWidth, contentHeight);
   maximized = true;
@@ -85,6 +125,7 @@ void FrameWindow::restoreSize()
   int cHeight = height - topHeight - borderWidth;
   XMoveResizeWindow(display, frameWindow, x, y, width, height);
   XResizeWindow(display, contentWindow, cWidth, cHeight);
+  XSetWindowBorderWidth(display, frameWindow, 1);
   maximized = false;
   updateButtonsPosition();
 }
