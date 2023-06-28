@@ -29,6 +29,8 @@ class WindowManager {
   void handleUnmapNotify(const XUnmapEvent event);
   void handleReparentNotify(const XReparentEvent event);
   void handleButtonPress(const XButtonEvent event);
+  void handleButtonRelease(const XButtonEvent event);
+  void handleMotionNotify(const XMotionEvent event);
   void handleDestroyNotify(const XDestroyWindowEvent event);
   void handleIgnoredEvent(const XEvent& event);
 

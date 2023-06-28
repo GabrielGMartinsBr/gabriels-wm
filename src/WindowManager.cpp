@@ -70,6 +70,12 @@ void WindowManager::run(const Central *ct)
       case ButtonPress:
         handleButtonPress(evt.xbutton);
         break;
+      case ButtonRelease:
+        handleButtonRelease(evt.xbutton);
+        break;
+      case MotionNotify:
+        handleMotionNotify(evt.xmotion);
+        break;
       case DestroyNotify:
         handleDestroyNotify(evt.xdestroywindow);
         break;
@@ -83,14 +89,18 @@ void WindowManager::run(const Central *ct)
   std::cout << "Closing Window Manager...\n";
 }
 
+//
+// Handlers
+//
+
 void WindowManager::handleCreateNotify(const XCreateWindowEvent event)
 {
-  std::cout << "XCreateWindowEvent:" << event.window << '\n';
+  // std::cout << "XCreateWindowEvent:" << event.window << '\n';
 }
 
 void WindowManager::handleConfigureRequest(const XConfigureRequestEvent event)
 {
-  std::cout << "XConfigureRequestEvent:" << event.window << '\n';
+  // std::cout << "XConfigureRequestEvent:" << event.window << '\n';
   XWindowChanges changes;
   changes.x = event.x;
   changes.y = event.y;
@@ -104,12 +114,11 @@ void WindowManager::handleConfigureRequest(const XConfigureRequestEvent event)
 
 void WindowManager::handleMapRequest(const XMapRequestEvent event)
 {
-  std::cout << "XMapRequestEvent:" << event.window << '\n';
+  // std::cout << "XMapRequestEvent:" << event.window << '\n';
   XWindowChanges changes;
   changes.x = 300;
   changes.y = 60;
   changes.border_width = 0;
-
   XConfigureWindow(display, event.window, CWX | CWY | CWBorderWidth, &changes);
   addWindowFrame(event.window);
   XMapWindow(display, event.window);
@@ -117,31 +126,62 @@ void WindowManager::handleMapRequest(const XMapRequestEvent event)
 
 void WindowManager::handleMapNotify(const XMapEvent event)
 {
-  std::cout << "XMapEvent: " << event.window << '\n';
+  // std::cout << "XMapEvent: " << event.window << '\n';
 }
 
 void WindowManager::handleUnmapNotify(const XUnmapEvent event)
 {
-  std::cout << "XUnmapEvent: " << event.window << '\n';
+  // std::cout << "XUnmapEvent: " << event.window << '\n';
   unFrame(event);
 }
 
 void WindowManager::handleReparentNotify(const XReparentEvent event)
 {
-  std::cout << "XReparentEvent: " << event.window << '\n';
+  // std::cout << "XReparentEvent: " << event.window << '\n';
 }
 
 void WindowManager::handleButtonPress(const XButtonEvent event)
 {
-  std::cout << "XButtonEvent:" << event.window << '\n';
+  // std::cout << "XButtonEvent:" << event.window << '\n';
+  // std::cout << "Button Press" << '\n';
+  // std::cout << "state:" << event.state << '\n';
+  // std::cout << "button:" << event.button << '\n';
+  // std::cout << "same_screen:" << event.same_screen << '\n';
+  // std::cout << "x:" << event.x << '\n';
+  // std::cout << "y:" << event.y << '\n';
+  // std::cout << "x_root:" << event.x_root << '\n';
+  // std::cout << "y_root:" << event.y_root << '\n';
+
+  if (framesMap.count(event.window)) {
+    FrameWindow *frame = framesMap[event.window];
+    frame->handleButtonEvent(true, event.x, event.y);
+  }
+
   Elementor::central.handleButtonClickEvent(
     event
   );
 }
 
+void WindowManager::handleButtonRelease(const XButtonEvent event)
+{
+  // std::cout << "Button Release" << '\n';
+  if (framesMap.count(event.window)) {
+    FrameWindow *frame = framesMap[event.window];
+    frame->handleButtonEvent(false, event.x, event.y);
+  }
+}
+
+void WindowManager::handleMotionNotify(const XMotionEvent event)
+{
+  if (framesMap.count(event.window)) {
+    FrameWindow *frame = framesMap[event.window];
+    frame->handleMotionEvent(event.x, event.y);
+  }
+}
+
 void WindowManager::handleDestroyNotify(const XDestroyWindowEvent event)
 {
-  std::cout << "XButtonEvent:" << event.window << '\n';
+  // std::cout << "XButtonEvent:" << event.window << '\n';
 }
 
 void WindowManager::handleIgnoredEvent(const XEvent &event)
@@ -151,6 +191,10 @@ void WindowManager::handleIgnoredEvent(const XEvent &event)
             << "[" << event.type << "]: ";
   std::cout << getEventName(event) << '\n';
 }
+
+//
+// Methods
+//
 
 void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
 {
@@ -171,10 +215,10 @@ void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
 
   FrameWindow *frame = new FrameWindow(&Elementor::central, window);
   frames[window] = frame->frameWindow;
-  framesMap[window] = frame;
+  framesMap[frame->frameWindow] = frame;
 
-  // std::cout << "FrameWindow: " << frame->frameWindow << " | "
-  //           << "FramedWindow: " << window << '\n';
+  std::cout << "FrameWindow: " << frame->frameWindow << " | "
+            << "FramedWindow: " << window << '\n';
 }
 
 void WindowManager::unFrame(const XUnmapEvent &evt)

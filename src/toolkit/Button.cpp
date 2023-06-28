@@ -1,6 +1,5 @@
 #include "./Button.h"
 
-
 Button::Button(
   Central* c,
   const Window parent,

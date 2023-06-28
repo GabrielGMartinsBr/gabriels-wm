@@ -1,5 +1,7 @@
 #include "./FrameWindow.h"
 
+#include <X11/Xlib.h>
+
 #include "toolkit/Elementor.h"
 
 FrameWindow::FrameWindow(
@@ -23,10 +25,12 @@ FrameWindow::FrameWindow(
   frameWindow = XCreateSimpleWindow(
     display, central->rootWindow,
     x, y, width, height,
-    0, 0, bgColor
+    1, 0x333333, bgColor
   );
 
-  long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask;
+  long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask
+                  | ButtonPressMask | ButtonReleaseMask
+                  | Button1MotionMask;
   XSelectInput(display, frameWindow, evtMasks);
 
   XReparentWindow(display, cWin, frameWindow, borderWidth, topHeight);
@@ -97,4 +101,43 @@ void FrameWindow::updateButtonsPosition()
   XMoveWindow(display, closeButton->win, _width - 15, 6);
   XMoveWindow(display, maximizeButton->win, _width - 30, 6);
   XMoveWindow(display, minimizeButton->win, _width - 45, 6);
+}
+
+void FrameWindow::handleButtonEvent(bool status, int _x, int _y)
+{
+  if (status) {
+    XRaiseWindow(display, frameWindow);
+    startDrag(_x, _y);
+  } else if (!status && dragging) {
+    stopDrag(_x, _y);
+  }
+}
+
+void FrameWindow::handleMotionEvent(int _x, int _y)
+{
+  updateDrag(_x, _y);
+}
+
+void FrameWindow::startDrag(int _x, int _y)
+{
+  dragging = true;
+  dragInitX = _x;
+  dragInitY = _y;
+}
+
+void FrameWindow::updateDrag(int _x, int _y)
+{
+  if (!dragging) {
+    return;
+  }
+  int dx = _x - dragInitX;
+  int dy = _y - dragInitY;
+  x += dx;
+  y += dy;
+  XMoveWindow(display, frameWindow, x, y);
+}
+
+void FrameWindow::stopDrag(int _x, int _y)
+{
+  dragging = false;
 }

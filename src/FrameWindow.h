@@ -29,6 +29,9 @@ class FrameWindow {
   void maximize();
   void restoreSize();
 
+  void handleButtonEvent(bool status, int x, int y);
+  void handleMotionEvent(int x, int y);
+
  private:
   Central *central;
   Display *display;
@@ -37,5 +40,13 @@ class FrameWindow {
   Button *maximizeButton;
   Button *minimizeButton;
 
+  bool dragging;
+  int dragInitX;
+  int dragInitY;
+
   void updateButtonsPosition();
+
+  void startDrag(int x, int y);
+  void updateDrag(int x, int y);
+  void stopDrag(int x, int y);
 };
