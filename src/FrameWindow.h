@@ -16,6 +16,8 @@ class FrameWindow {
   int width;
   int height;
   bool maximized;
+  
+  char* winName;
 
   Window frameWindow;
   Window contentWindow;
@@ -40,6 +42,10 @@ class FrameWindow {
   bool dragging;
   int dragInitX;
   int dragInitY;
+
+  void getWinAttrs();
+
+  void drawElements();
 
   void updateButtonsPosition();
 

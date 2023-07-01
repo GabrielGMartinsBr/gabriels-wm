@@ -2,8 +2,11 @@
 
 #include <X11/Xlib.h>
 
+#include <iostream>
+
 #include "toolkit/Elementor.h"
 #include "toolkit/events/Events.h"
+#include "toolkit/utils/WindowUtils.h"
 
 FrameWindow::FrameWindow(
   Central* ct,
@@ -31,7 +34,10 @@ FrameWindow::FrameWindow(
 
   long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask
                   | ButtonPressMask | ButtonReleaseMask
-                  | Button1MotionMask;
+                  | Button1MotionMask
+                  | ExposureMask
+                  | VisibilityChangeMask
+                  | EnterWindowMask;
   XSelectInput(display, frameWindow, evtMasks);
 
   XReparentWindow(display, cWin, frameWindow, borderWidth, topHeight);
@@ -39,7 +45,7 @@ FrameWindow::FrameWindow(
   XMapWindow(display, frameWindow);
 
   closeButton = Elementor::button(
-    frameWindow, width - 15, 6, 12, 12,
+    frameWindow, width - 19, 4, 15, 15,
     0xff4030
   );
   closeButton->onClick([=](Event e) {
@@ -47,7 +53,7 @@ FrameWindow::FrameWindow(
   });
 
   maximizeButton = Elementor::button(
-    frameWindow, width - 31, 6, 12, 12,
+    frameWindow, width - 37, 4, 15, 15,
     0x00df30
   );
 
@@ -57,7 +63,7 @@ FrameWindow::FrameWindow(
 
   maximizeButton->onClick(closeCb);
   minimizeButton = Elementor::button(
-    frameWindow, width - 47, 6, 12, 12,
+    frameWindow, width - 55, 4, 15, 15,
     0xefdf00
   );
 
@@ -68,8 +74,39 @@ FrameWindow::FrameWindow(
       handleMaximizeClick();
     }
   );
-
+  getWinAttrs();
+  drawElements();
   registerEvents();
+}
+
+void FrameWindow::getWinAttrs()
+{
+  if (!contentWindow) return;
+  winName = WindowUtils::getNameProp(
+    display,
+    contentWindow
+  );
+  std::cout << "winName" << winName << '\n';
+}
+
+void FrameWindow::drawElements()
+{
+  int screen = DefaultScreen(display);
+  Visual* visual = DefaultVisual(display, screen);
+  cairo_surface_t* sfc = cairo_xlib_surface_create(
+    display, frameWindow, visual, width, topHeight
+  );
+  cairo_t* cr = cairo_create(sfc);
+  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+
+  cairo_select_font_face(cr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(cr, 12);
+
+  cairo_move_to(cr, 6, 16);
+  cairo_show_text(cr, winName);
+
+  cairo_surface_flush(sfc);
+  XFlush(display);
 }
 
 void FrameWindow::registerEvents()
@@ -139,9 +176,9 @@ void FrameWindow::updateButtonsPosition()
     XGetWindowAttributes(display, central->rootWindow, &winAttrs);
     _width = winAttrs.width;
   }
-  XMoveWindow(display, closeButton->win, _width - 15, 6);
-  XMoveWindow(display, maximizeButton->win, _width - 30, 6);
-  XMoveWindow(display, minimizeButton->win, _width - 45, 6);
+  XMoveWindow(display, closeButton->win, _width - 19, 6);
+  XMoveWindow(display, maximizeButton->win, _width - 37, 6);
+  XMoveWindow(display, minimizeButton->win, _width - 55, 6);
 }
 
 void FrameWindow::handleButtonEvent(bool status, int _x, int _y)
