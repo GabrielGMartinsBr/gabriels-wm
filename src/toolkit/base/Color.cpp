@@ -25,7 +25,7 @@ Color::Color(const char* str)
   }
   hexStr[7] = '\0';
 
-  hex = hexToDec(str);
+  hex = hexToDec(hexStr);
   r = ((hex >> 16) & 0xFF) / 255.0;
   g = ((hex >> 8) & 0xFF) / 255.0;
   b = (hex & 0xFF) / 255.0;
