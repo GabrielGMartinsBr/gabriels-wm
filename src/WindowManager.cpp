@@ -97,7 +97,7 @@ void WindowManager::run(const Central *ct)
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
-        handleIgnoredEvent(evt);
+        // handleIgnoredEvent(evt);
       }
     }
   }

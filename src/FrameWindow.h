@@ -2,6 +2,7 @@
 
 #include <X11/Xlib.h>
 
+#include "toolkit/base/Color.h"
 #include "toolkit/Button.h"
 #include "toolkit/Central.h"
 
@@ -13,7 +14,9 @@ class FrameWindow {
  public:
   static const int topHeight = 24;
   static const int borderWidth = 3;
-  static const unsigned long bgColor = 0x3f7faf;
+  static const unsigned long BG_COLOR_HEX = 0x3f7faf;
+
+  Color bgColor;
 
   int x;
   int y;

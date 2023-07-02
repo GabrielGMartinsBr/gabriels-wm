@@ -13,7 +13,8 @@ FrameWindow::FrameWindow(
   Central* ct,
   Window cWin
 ) :
-    maximized(false)
+    maximized(false),
+    bgColor(BG_COLOR_HEX)
 {
   central = ct;
   display = ct->display;
@@ -30,7 +31,7 @@ FrameWindow::FrameWindow(
   frameWindow = XCreateSimpleWindow(
     display, central->rootWindow,
     x, y, width, height,
-    1, 0x333333, bgColor
+    1, 0x333333, bgColor.hex
   );
 
   long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask
@@ -164,11 +165,8 @@ void FrameWindow::handleXEvent(const XEvent evt)
   if (evt.type != Expose) {
     return;
   }
-  double red = ((bgColor >> 16) & 0xFF) / 255.0;
-  double green = ((bgColor >> 8) & 0xFF) / 255.0;
-  double blue = (bgColor & 0xFF) / 255.0;
 
-  cairo_set_source_rgb(cr, red, green, blue);
+  cairo_set_source_rgb(cr, bgColor.r, bgColor.g, bgColor.b);
   cairo_paint(cr);
 
   cairo_set_source_surface(cr, titleSfc, 0, 0);
