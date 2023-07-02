@@ -4,6 +4,7 @@
 
 #include <iostream>
 
+#include "cairo.h"
 #include "toolkit/Elementor.h"
 #include "toolkit/events/Events.h"
 #include "toolkit/utils/WindowUtils.h"
@@ -74,39 +75,63 @@ FrameWindow::FrameWindow(
       handleMaximizeClick();
     }
   );
+
+  setupCairo();
   getWinAttrs();
   drawElements();
   registerEvents();
 }
 
+void FrameWindow::setupCairo()
+{
+  int screen = DefaultScreen(display);
+  Visual* visual = DefaultVisual(display, screen);
+  sfc = cairo_xlib_surface_create(
+    display, frameWindow, visual, width, topHeight
+  );
+
+  cr = cairo_create(sfc);
+
+  titleSfc = cairo_image_surface_create(
+    CAIRO_FORMAT_ARGB32, width, topHeight
+  );
+
+  cairo_save(cr);
+}
+
 void FrameWindow::getWinAttrs()
 {
-  if (!contentWindow) return;
+  if (!contentWindow) {
+    return;
+  }
   winName = WindowUtils::getNameProp(
     display,
     contentWindow
   );
-  std::cout << "winName" << winName << '\n';
+  if (!winName) {
+    winName = "Dev Window";
+  }
 }
 
 void FrameWindow::drawElements()
 {
-  int screen = DefaultScreen(display);
-  Visual* visual = DefaultVisual(display, screen);
-  cairo_surface_t* sfc = cairo_xlib_surface_create(
-    display, frameWindow, visual, width, topHeight
-  );
-  cairo_t* cr = cairo_create(sfc);
-  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+  drawTitle();
 
-  cairo_select_font_face(cr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(cr, 12);
-
-  cairo_move_to(cr, 6, 16);
-  cairo_show_text(cr, winName);
+  cairo_set_source_surface(cr, titleSfc, 0, 0);
+  cairo_paint(cr);
 
   cairo_surface_flush(sfc);
   XFlush(display);
+}
+
+void FrameWindow::drawTitle()
+{
+  cairo_t* titleCr = cairo_create(titleSfc);
+  cairo_set_source_rgb(titleCr, 1.0, 1.0, 1.0);
+  cairo_select_font_face(titleCr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(titleCr, 12);
+  cairo_move_to(titleCr, 6, 16);
+  cairo_show_text(titleCr, winName);
 }
 
 void FrameWindow::registerEvents()
@@ -132,6 +157,24 @@ void FrameWindow::registerEvents()
       handleMotionEvent(e.x, e.y);
     }
   );
+}
+
+void FrameWindow::handleXEvent(const XEvent evt)
+{
+  if (evt.type != Expose) {
+    return;
+  }
+  double red = ((bgColor >> 16) & 0xFF) / 255.0;
+  double green = ((bgColor >> 8) & 0xFF) / 255.0;
+  double blue = (bgColor & 0xFF) / 255.0;
+
+  cairo_set_source_rgb(cr, red, green, blue);
+  cairo_paint(cr);
+
+  cairo_set_source_surface(cr, titleSfc, 0, 0);
+  cairo_paint(cr);
+
+  cairo_surface_flush(sfc);
 }
 
 void FrameWindow::handleMaximizeClick()

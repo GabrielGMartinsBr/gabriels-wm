@@ -5,6 +5,10 @@
 #include "toolkit/Button.h"
 #include "toolkit/Central.h"
 
+// TODO: Create Color Struct
+// TODO: Create Small Title surface
+// TODO: 
+
 class FrameWindow {
  public:
   static const int topHeight = 24;
@@ -16,11 +20,16 @@ class FrameWindow {
   int width;
   int height;
   bool maximized;
-  
-  char* winName;
+
+  const char *winName;
 
   Window frameWindow;
   Window contentWindow;
+
+  cairo_surface_t *sfc;
+  cairo_t *cr;
+
+  cairo_surface_t *titleSfc;
 
   FrameWindow(
     Central *ct,
@@ -30,6 +39,8 @@ class FrameWindow {
   void handleMaximizeClick();
   void maximize();
   void restoreSize();
+
+  void handleXEvent(const XEvent evt);
 
  private:
   Central *central;
@@ -43,9 +54,13 @@ class FrameWindow {
   int dragInitX;
   int dragInitY;
 
+  void setupCairo();
+
   void getWinAttrs();
 
   void drawElements();
+
+  void drawTitle();
 
   void updateButtonsPosition();
 
