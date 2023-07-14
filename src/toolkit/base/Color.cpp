@@ -11,21 +11,20 @@ Color::Color(int hexValue)
 
 Color::Color(const char* str)
 {
-  hexStr[0] = '#';
+  hexStr = '#';
   if (std::strlen(str) == 7) {
     for (int i = 0; i < 6; i++) {
-      hexStr[i + 1] = str[i + 1];
+      hexStr.push_back(str[i + 1]);
     }
   }
   if (std::strlen(str) == 4) {
     for (int i = 0; i < 3; i++) {
-      hexStr[i * 2 + 1] = str[i + 1];
-      hexStr[i * 2 + 2] = str[i + 1];
+      hexStr.push_back(str[i + 1]);
+      hexStr.push_back(str[i + 1]);
     }
   }
-  hexStr[7] = '\0';
 
-  hex = hexToDec(hexStr);
+  hex = hexToDec(hexStr.c_str());
   r = ((hex >> 16) & 0xFF) / 255.0;
   g = ((hex >> 8) & 0xFF) / 255.0;
   b = (hex & 0xFF) / 255.0;

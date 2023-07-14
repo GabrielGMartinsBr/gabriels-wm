@@ -7,7 +7,7 @@
 #include <string>
 
 struct Color {
-  char* hexStr;
+  std::string hexStr = "#000000";
   int hex;
   double r;
   double g;
