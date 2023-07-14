@@ -13,12 +13,12 @@
 
 class WindowManager {
  public:
-  WindowManager(const Central *ct);
+  WindowManager(Central *ct);
 
   void run();
 
  private:
-  const Central *central;
+  Central *central;
   Display *display;
   Window rootWindow;
 

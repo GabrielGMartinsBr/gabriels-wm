@@ -2,6 +2,7 @@
 
 #include "events/EventHandler.h"
 
+
 void Central::init()
 {
   display = XOpenDisplay(nullptr);
@@ -10,6 +11,12 @@ void Central::init()
   }
   rootWindow = DefaultRootWindow(display);
 
+  cursors = new Cursors(display);
+
   eventsHandler = new EventHandler();
 }
 
+void Central::setCursor(Cursor cursor)
+{
+  XDefineCursor(display, rootWindow, cursor);
+}

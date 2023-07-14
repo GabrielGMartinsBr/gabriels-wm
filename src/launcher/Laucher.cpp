@@ -1,3 +1,4 @@
+#include <X11/X.h>
 #include <X11/Xlib.h>
 
 #include <iostream>
@@ -6,7 +7,7 @@
 #include "cairo-xlib.h"
 #include "cairo.h"
 
-Launcher::Launcher(const Central* ct) :
+Launcher::Launcher(Central* ct) :
     bgColor("#333"),
     startButton("Iniciar")
 {
@@ -47,6 +48,8 @@ void Launcher::createWindow()
                   | ExposureMask
                   | ButtonPressMask
                   | ButtonReleaseMask
+                  | EnterWindowMask
+                  | LeaveWindowMask
                   | PointerMotionMask;
 
   XSelectInput(display, window, evtMasks);
@@ -78,6 +81,12 @@ void Launcher::handleXEvent(const XEvent evt)
   switch (evt.type) {
     case Expose:
       draw();
+      break;
+    case EnterNotify:
+      central->setCursor(central->cursors->Pointer);
+      break;
+    case LeaveNotify:
+      central->setCursor(central->cursors->Default);
       break;
   }
   std::cout << evt.type << '\n';

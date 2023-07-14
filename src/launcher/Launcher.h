@@ -18,7 +18,7 @@ struct Launcher {
   int height;
   Color bgColor;
 
-  const Central *central;
+  Central *central;
   Display *display;
   Window window;
   Window rootWindow;
@@ -32,7 +32,7 @@ struct Launcher {
   std::vector<LauncherEntry> entries;
 
   Launcher(
-    const Central *ct
+    Central *ct
   );
 
   void handleXEvent(const XEvent evt);

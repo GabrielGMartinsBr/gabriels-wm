@@ -23,7 +23,7 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
   return 0;
 }
 
-WindowManager::WindowManager(const Central *ct) :
+WindowManager::WindowManager(Central *ct) :
     launcher(ct)
 {
   central = ct;
@@ -34,7 +34,8 @@ WindowManager::WindowManager(const Central *ct) :
 void WindowManager::run()
 {
   Cursor cursor = XCreateFontCursor(display, XC_arrow);
-  XDefineCursor(display, rootWindow, cursor);
+  // XDefineCursor(display, rootWindow, cursor);
+  central->setCursor(cursor);
 
   // Try to get window manager events
   long events = SubstructureRedirectMask | SubstructureNotifyMask;
