@@ -5,8 +5,8 @@ int main(int, char **)
 {
   Elementor::init();
 
-  WindowManager wm;
-  wm.run(&Elementor::central);
+  WindowManager wm(&Elementor::central);
+  wm.run();
 
   return 0;
 }

@@ -8,16 +8,21 @@
 #include <unordered_map>
 
 #include "FrameWindow.h"
+#include "launcher/Launcher.h"
 #include "toolkit/Central.h"
 
 class WindowManager {
  public:
-  void run(const Central *ct);
+  WindowManager(const Central *ct);
+
+  void run();
 
  private:
   const Central *central;
   Display *display;
   Window rootWindow;
+
+  Launcher launcher;
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
@@ -32,7 +37,7 @@ class WindowManager {
   void handleButtonRelease(const XButtonEvent event);
   void handleMotionNotify(const XMotionEvent event);
   void handleDestroyNotify(const XDestroyWindowEvent event);
-  void handleIgnoredEvent(const XEvent& event);
+  void handleIgnoredEvent(const XEvent &event);
 
   void addWindowFrame(Window window, Bool isPreExisting = false);
 

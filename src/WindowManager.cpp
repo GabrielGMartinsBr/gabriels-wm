@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "FrameWindow.h"
+#include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
 #include "utils/codes.h"
 
@@ -22,12 +23,16 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
   return 0;
 }
 
-void WindowManager::run(const Central *ct)
+WindowManager::WindowManager(const Central *ct) :
+    launcher(ct)
 {
   central = ct;
   display = central->display;
   rootWindow = central->rootWindow;
+}
 
+void WindowManager::run()
+{
   Cursor cursor = XCreateFontCursor(display, XC_arrow);
   XDefineCursor(display, rootWindow, cursor);
 
@@ -48,6 +53,7 @@ void WindowManager::run(const Central *ct)
 
   while (true) {
     XNextEvent(display, &evt);
+    launcher.handleXEvent(evt);
     switch (evt.type) {
       case CreateNotify:
         handleCreateNotify(evt.xcreatewindow);
