@@ -188,11 +188,15 @@ void FrameWindow::maximize()
 {
   XWindowAttributes winAttrs;
   XGetWindowAttributes(display, central->rootWindow, &winAttrs);
-  int contentWidth = winAttrs.width - borderWidth * 2;
-  int contentHeight = winAttrs.height - topHeight;
+
+  int fullWidth = winAttrs.width;
+  int fullHeight = winAttrs.height - 40;
+
+  int contW = fullWidth - 2;
+  int contH = fullHeight - topHeight - 1;
   XSetWindowBorderWidth(display, frameWindow, 0);
-  XMoveResizeWindow(display, frameWindow, 0, 0, winAttrs.width, winAttrs.height);
-  XResizeWindow(display, contentWindow, contentWidth, contentHeight);
+  XMoveResizeWindow(display, frameWindow, 0, 0, fullWidth, fullHeight);
+  XMoveResizeWindow(display, contentWindow, 1, topHeight, contW, contH);
   maximized = true;
   updateButtonsPosition();
 }
@@ -202,7 +206,7 @@ void FrameWindow::restoreSize()
   int cWidth = width - borderWidth * 2;
   int cHeight = height - topHeight - borderWidth;
   XMoveResizeWindow(display, frameWindow, x, y, width, height);
-  XResizeWindow(display, contentWindow, cWidth, cHeight);
+  XMoveResizeWindow(display, contentWindow, borderWidth, topHeight, cWidth, cHeight);
   XSetWindowBorderWidth(display, frameWindow, 1);
   maximized = false;
   updateButtonsPosition();
@@ -217,9 +221,9 @@ void FrameWindow::updateButtonsPosition()
     XGetWindowAttributes(display, central->rootWindow, &winAttrs);
     _width = winAttrs.width;
   }
-  XMoveWindow(display, closeButton->win, _width - 19, 6);
-  XMoveWindow(display, maximizeButton->win, _width - 37, 6);
-  XMoveWindow(display, minimizeButton->win, _width - 55, 6);
+  XMoveWindow(display, closeButton->win, _width - 19, 4);
+  XMoveWindow(display, maximizeButton->win, _width - 37, 4);
+  XMoveWindow(display, minimizeButton->win, _width - 55, 4);
 }
 
 void FrameWindow::handleButtonEvent(bool status, int _x, int _y)
