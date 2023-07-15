@@ -5,9 +5,9 @@
 
 #include <iostream>
 
+#include "cairo-xlib.h"
 #include "cairo.h"
-#include "toolkit/Elementor.h"
-#include "toolkit/events/Events.h"
+#include "toolkit/base/Color.h"
 #include "toolkit/utils/WindowUtils.h"
 
 FrameWindow::FrameWindow(
@@ -15,7 +15,10 @@ FrameWindow::FrameWindow(
   Window cWin
 ) :
     maximized(false),
-    bgColor(BG_COLOR_HEX)
+    bgColor(BG_COLOR_HEX),
+    closeButton(0xff4030),
+    maximizeButton(0x00df30),
+    minimizeButton(0xefdf00)
 {
   central = ct;
   display = ct->display;
@@ -38,6 +41,7 @@ FrameWindow::FrameWindow(
   long frameEvents = SubstructureRedirectMask | SubstructureNotifyMask
                      | ButtonPressMask | ButtonReleaseMask
                      | Button1MotionMask
+                     | PointerMotionMask
                      | ExposureMask
                      | VisibilityChangeMask
                      | EnterWindowMask;
@@ -47,40 +51,8 @@ FrameWindow::FrameWindow(
 
   XMapWindow(display, frameWindow);
 
-  closeButton = Elementor::button(
-    frameWindow, width - 19, 4, 15, 15,
-    0xff4030
-  );
-  closeButton->onClick([=](Event e) {
-    XKillClient(display, cWin);
-  });
-
-  maximizeButton = Elementor::button(
-    frameWindow, width - 37, 4, 15, 15,
-    0x00df30
-  );
-
-  auto closeCb = [this](Event e) {
-    handleMaximizeClick();
-  };
-
-  maximizeButton->onClick(closeCb);
-  minimizeButton = Elementor::button(
-    frameWindow, width - 55, 4, 15, 15,
-    0xefdf00
-  );
-
-  central->eventsHandler->addEventCb(
-    EventType::BUTTON_PRESS,
-    minimizeButton->win,
-    [this](Event e) {
-      handleMaximizeClick();
-    }
-  );
-
   setupCairo();
   getWinAttrs();
-  drawElements();
 }
 
 void FrameWindow::setupCairo()
@@ -90,14 +62,8 @@ void FrameWindow::setupCairo()
   sfc = cairo_xlib_surface_create(
     display, frameWindow, visual, width, topHeight
   );
-
   cr = cairo_create(sfc);
-
-  titleSfc = cairo_image_surface_create(
-    CAIRO_FORMAT_ARGB32, width, topHeight
-  );
-
-  cairo_save(cr);
+  tr = new Tracer(cr);
 }
 
 void FrameWindow::handleXEvent(const XEvent evt)
@@ -132,18 +98,54 @@ void FrameWindow::handleXEvent(const XEvent evt)
 
 void FrameWindow::onExpose()
 {
-  cairo_set_source_rgb(cr, bgColor.r, bgColor.g, bgColor.b);
-  cairo_paint(cr);
+  if (maximized && !isCairoMaximized) {
+    cairo_xlib_surface_set_size(
+      sfc,
+      central->availWidth,
+      topHeight
+    );
+    isCairoMaximized = true;
+  }
+  if (!maximized && isCairoMaximized) {
+    cairo_xlib_surface_set_size(
+      sfc,
+      width,
+      topHeight
+    );
+    isCairoMaximized = false;
+  }
 
-  cairo_set_source_surface(cr, titleSfc, 0, 0);
+  cairo_set_source_rgb(
+    cr,
+    bgColor.r,
+    bgColor.g,
+    bgColor.b
+  );
   cairo_paint(cr);
-
-  cairo_surface_flush(sfc);
+  drawTitle();
+  drawFrameButtons();
 }
 
 void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
 {
+  if (evt.window != frameWindow) {
+    return;
+  }
+
+  if (minimizeButton.isHover(evt.x, evt.y)) {
+    return;
+  }
+  if (maximizeButton.isHover(evt.x, evt.y)) {
+    handleMaximizeClick();
+    return;
+  }
+  if (closeButton.isHover(evt.x, evt.y)) {
+    XKillClient(display, contentWindow);
+    return;
+  }
+
   XRaiseWindow(display, frameWindow);
+
   if (evt.window == frameWindow) {
     startDrag(evt.x, evt.y);
   }
@@ -158,8 +160,27 @@ void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
 
 void FrameWindow::handleMotion(const XMotionEvent evt)
 {
-  if (evt.window == frameWindow) {
+  if (evt.window != frameWindow) {
+    return;
+  }
+  if (isDragging) {
     updateDrag(evt.x, evt.y);
+    return;
+  }
+  if (
+    minimizeButton.isHover(evt.x, evt.y)
+    || maximizeButton.isHover(evt.x, evt.y)
+    || closeButton.isHover(evt.x, evt.y)
+  ) {
+    if (!cursorChanged) {
+      central->cursors->set(frameWindow, CursorKey::POINTER);
+      cursorChanged = true;
+    }
+    return;
+  }
+  if (cursorChanged) {
+    central->cursors->set(frameWindow, CursorKey::DEFAULT);
+    cursorChanged = false;
   }
 }
 
@@ -177,25 +198,46 @@ void FrameWindow::getWinAttrs()
   }
 }
 
-void FrameWindow::drawElements()
-{
-  drawTitle();
-
-  cairo_set_source_surface(cr, titleSfc, 0, 0);
-  cairo_paint(cr);
-
-  cairo_surface_flush(sfc);
-  XFlush(display);
-}
-
 void FrameWindow::drawTitle()
 {
-  cairo_t* titleCr = cairo_create(titleSfc);
-  cairo_set_source_rgb(titleCr, 1.0, 1.0, 1.0);
-  cairo_select_font_face(titleCr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-  cairo_set_font_size(titleCr, 12);
-  cairo_move_to(titleCr, 6, 16);
-  cairo_show_text(titleCr, winName);
+  cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
+  cairo_select_font_face(cr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_set_font_size(cr, 12);
+  cairo_move_to(cr, 6, 16);
+  cairo_show_text(cr, winName);
+  cairo_fill(cr);
+}
+
+void FrameWindow::drawFrameButtons()
+{
+  int w = width;
+  if (maximized) {
+    w = central->availWidth;
+  }
+
+  int size = 13;
+  int space = 3;
+  int fSize = size + space;
+  int len = 3;
+
+  int radius = size / 2;
+  int x = w - (len * fSize) + radius;
+  int y = topHeight / 2;
+  minimizeButton.x = x;
+  minimizeButton.y = y;
+  minimizeButton.radius = radius;
+  x += fSize;
+  maximizeButton.x = x;
+  maximizeButton.y = y;
+  maximizeButton.radius = radius;
+  x += fSize;
+  closeButton.x = x;
+  closeButton.y = y;
+  closeButton.radius = radius;
+
+  minimizeButton.draw(tr);
+  maximizeButton.draw(tr);
+  closeButton.draw(tr);
 }
 
 void FrameWindow::handleMaximizeClick()
@@ -214,11 +256,11 @@ void FrameWindow::maximize()
 
   int contW = fullWidth - 2;
   int contH = fullHeight - topHeight - 1;
+
   XSetWindowBorderWidth(display, frameWindow, 0);
   XMoveResizeWindow(display, frameWindow, 0, 0, fullWidth, fullHeight);
   XMoveResizeWindow(display, contentWindow, 1, topHeight, contW, contH);
   maximized = true;
-  updateButtonsPosition();
 }
 
 void FrameWindow::restoreSize()
@@ -229,45 +271,18 @@ void FrameWindow::restoreSize()
   XMoveResizeWindow(display, contentWindow, borderWidth, topHeight, cWidth, cHeight);
   XSetWindowBorderWidth(display, frameWindow, 1);
   maximized = false;
-  updateButtonsPosition();
-}
-
-void FrameWindow::updateButtonsPosition()
-{
-  int _width = width;
-  if (maximized) {
-    _width = central->availWidth;
-  }
-  XMoveWindow(display, closeButton->win, _width - 19, 4);
-  XMoveWindow(display, maximizeButton->win, _width - 37, 4);
-  XMoveWindow(display, minimizeButton->win, _width - 55, 4);
-}
-
-void FrameWindow::handleButtonEvent(bool status, int _x, int _y)
-{
-  if (status) {
-    XRaiseWindow(display, frameWindow);
-    startDrag(_x, _y);
-  } else if (!status && dragging) {
-    stopDrag(_x, _y);
-  }
-}
-
-void FrameWindow::handleMotionEvent(int _x, int _y)
-{
-  updateDrag(_x, _y);
 }
 
 void FrameWindow::startDrag(int _x, int _y)
 {
-  dragging = true;
+  isDragging = true;
   dragInitX = _x;
   dragInitY = _y;
 }
 
 void FrameWindow::updateDrag(int _x, int _y)
 {
-  if (!dragging) {
+  if (!isDragging) {
     return;
   }
   int dx = _x - dragInitX;
@@ -279,5 +294,28 @@ void FrameWindow::updateDrag(int _x, int _y)
 
 void FrameWindow::stopDrag(int _x, int _y)
 {
-  dragging = false;
+  isDragging = false;
+}
+
+// CircleButton
+
+FrameWindow::CircleButton::CircleButton(int hex) :
+    color(hex)
+{
+  radius = 6;
+}
+
+void FrameWindow::CircleButton::draw(Tracer* tr)
+{
+  tr->setColor(color);
+  cairo_arc(tr->cr, x, y, radius, 0, PI2);
+  cairo_fill(tr->cr);
+}
+
+bool FrameWindow::CircleButton::isHover(int _x, int _y)
+{
+  double distance = std::sqrt(
+    std::pow(_x - x, 2) + std::pow(_y - y, 2)
+  );
+  return distance <= radius;
 }

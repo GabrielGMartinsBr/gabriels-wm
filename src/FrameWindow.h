@@ -2,8 +2,10 @@
 
 #include <X11/Xlib.h>
 
-#include "toolkit/Button.h"
+#include <cmath>
+
 #include "toolkit/Central.h"
+#include "toolkit/Tracer.h"
 #include "toolkit/base/Color.h"
 
 // TODO: Create Color Struct
@@ -11,6 +13,21 @@
 // TODO:
 
 class FrameWindow {
+  struct CircleButton {
+    int x;
+    int y;
+    int radius;
+    Color color;
+
+    const static int PI2 = 2 * M_PI;
+
+    CircleButton(int colorHex);
+
+    void draw(Tracer *tr);
+
+    bool isHover(int _x, int _y);
+  };
+
  public:
   static const int topHeight = 24;
   static const int borderWidth = 3;
@@ -31,6 +48,7 @@ class FrameWindow {
 
   cairo_surface_t *sfc;
   cairo_t *cr;
+  Tracer *tr;
 
   cairo_surface_t *titleSfc;
 
@@ -49,13 +67,15 @@ class FrameWindow {
   Central *central;
   Display *display;
 
-  Button *closeButton;
-  Button *maximizeButton;
-  Button *minimizeButton;
+  CircleButton closeButton;
+  CircleButton maximizeButton;
+  CircleButton minimizeButton;
 
-  bool dragging;
+  bool isDragging;
   int dragInitX;
   int dragInitY;
+  bool cursorChanged;
+  bool isCairoMaximized;
 
   void setupCairo();
 
@@ -71,12 +91,9 @@ class FrameWindow {
 
   void drawTitle();
 
+  void drawFrameButtons();
+
   void drawElements();
-
-  void updateButtonsPosition();
-
-  void handleButtonEvent(bool status, int x, int y);
-  void handleMotionEvent(int x, int y);
 
   void startDrag(int x, int y);
   void updateDrag(int x, int y);
