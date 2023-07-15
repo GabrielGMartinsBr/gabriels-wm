@@ -51,6 +51,9 @@ void WindowManager::run()
   while (true) {
     XNextEvent(display, &evt);
     launcher.handleXEvent(evt);
+    for (auto &f : framesMap) {
+      f.second->handleXEvent(evt);
+    }
     switch (evt.type) {
       case CreateNotify:
         handleCreateNotify(evt.xcreatewindow);
@@ -73,19 +76,19 @@ void WindowManager::run()
         handleReparentNotify(evt.xreparent);
         break;
       case Expose:
-        if (framesMap.count(evt.xexpose.window)) {
-          framesMap[evt.xexpose.window]->handleXEvent(evt);
-          break;
-        }
-        std::cout << "======================================\n";
-        // std::cout << "display: " << evt.xexpose.display << '\n';
-        // std::cout << "window: " << evt.xexpose.window << '\n';
-        std::cout << "x: " << evt.xexpose.x << '\n';
-        std::cout << "y: " << evt.xexpose.y << '\n';
-        std::cout << "width: " << evt.xexpose.width << '\n';
-        std::cout << "height: " << evt.xexpose.height << '\n';
-        // std::cout << "count: " << evt.xexpose.count << '\n';
-        std::cout << "======================================\n";
+        // if (framesMap.count(evt.xexpose.window)) {
+        //   framesMap[evt.xexpose.window]->handleXEvent(evt);
+        //   break;
+        // }
+        // std::cout << "======================================\n";
+        // // std::cout << "display: " << evt.xexpose.display << '\n';
+        // // std::cout << "window: " << evt.xexpose.window << '\n';
+        // std::cout << "x: " << evt.xexpose.x << '\n';
+        // std::cout << "y: " << evt.xexpose.y << '\n';
+        // std::cout << "width: " << evt.xexpose.width << '\n';
+        // std::cout << "height: " << evt.xexpose.height << '\n';
+        // // std::cout << "count: " << evt.xexpose.count << '\n';
+        // std::cout << "======================================\n";
         break;
       case ButtonPress:
         handleButtonPress(evt.xbutton);
@@ -100,7 +103,7 @@ void WindowManager::run()
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
-        handleIgnoredEvent(evt);
+        // handleIgnoredEvent(evt);
       }
     }
   }

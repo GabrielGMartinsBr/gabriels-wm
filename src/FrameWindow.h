@@ -2,13 +2,13 @@
 
 #include <X11/Xlib.h>
 
-#include "toolkit/base/Color.h"
 #include "toolkit/Button.h"
 #include "toolkit/Central.h"
+#include "toolkit/base/Color.h"
 
 // TODO: Create Color Struct
 // TODO: Create Small Title surface
-// TODO: 
+// TODO:
 
 class FrameWindow {
  public:
@@ -59,15 +59,21 @@ class FrameWindow {
 
   void setupCairo();
 
-  void getWinAttrs();
+  void onExpose();
 
-  void drawElements();
+  void handleButtonPress(const XButtonPressedEvent evt);
+
+  void handleButtonRelease(const XButtonReleasedEvent evt);
+
+  void handleMotion(const XMotionEvent evt);
+
+  void getWinAttrs();
 
   void drawTitle();
 
-  void updateButtonsPosition();
+  void drawElements();
 
-  void registerEvents();
+  void updateButtonsPosition();
 
   void handleButtonEvent(bool status, int x, int y);
   void handleMotionEvent(int x, int y);

@@ -1,5 +1,6 @@
 #include "./FrameWindow.h"
 
+#include <X11/X.h>
 #include <X11/Xlib.h>
 
 #include <iostream>
@@ -34,13 +35,13 @@ FrameWindow::FrameWindow(
     1, 0x333333, bgColor.hex
   );
 
-  long evtMasks = SubstructureRedirectMask | SubstructureNotifyMask
-                  | ButtonPressMask | ButtonReleaseMask
-                  | Button1MotionMask
-                  | ExposureMask
-                  | VisibilityChangeMask
-                  | EnterWindowMask;
-  XSelectInput(display, frameWindow, evtMasks);
+  long frameEvents = SubstructureRedirectMask | SubstructureNotifyMask
+                     | ButtonPressMask | ButtonReleaseMask
+                     | Button1MotionMask
+                     | ExposureMask
+                     | VisibilityChangeMask
+                     | EnterWindowMask;
+  XSelectInput(display, frameWindow, frameEvents);
 
   XReparentWindow(display, cWin, frameWindow, borderWidth, topHeight);
 
@@ -80,7 +81,6 @@ FrameWindow::FrameWindow(
   setupCairo();
   getWinAttrs();
   drawElements();
-  registerEvents();
 }
 
 void FrameWindow::setupCairo()
@@ -98,6 +98,69 @@ void FrameWindow::setupCairo()
   );
 
   cairo_save(cr);
+}
+
+void FrameWindow::handleXEvent(const XEvent evt)
+{
+  if (
+    evt.xany.window != frameWindow
+    && evt.xany.window != contentWindow
+  ) {
+    return;
+  }
+
+  switch (evt.type) {
+    case Expose:
+      if (evt.xexpose.window == frameWindow) {
+        onExpose();
+      }
+      break;
+    case FocusIn:
+      std::cout << "FocusIn!" << '\n';
+      break;
+    case ButtonPress:
+      handleButtonPress(evt.xbutton);
+      break;
+    case ButtonRelease:
+      handleButtonRelease(evt.xbutton);
+      break;
+    case MotionNotify:
+      handleMotion(evt.xmotion);
+      break;
+  }
+}
+
+void FrameWindow::onExpose()
+{
+  cairo_set_source_rgb(cr, bgColor.r, bgColor.g, bgColor.b);
+  cairo_paint(cr);
+
+  cairo_set_source_surface(cr, titleSfc, 0, 0);
+  cairo_paint(cr);
+
+  cairo_surface_flush(sfc);
+}
+
+void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
+{
+  XRaiseWindow(display, frameWindow);
+  if (evt.window == frameWindow) {
+    startDrag(evt.x, evt.y);
+  }
+}
+
+void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
+{
+  if (evt.window == frameWindow) {
+    stopDrag(evt.x, evt.y);
+  }
+}
+
+void FrameWindow::handleMotion(const XMotionEvent evt)
+{
+  if (evt.window == frameWindow) {
+    updateDrag(evt.x, evt.y);
+  }
 }
 
 void FrameWindow::getWinAttrs()
@@ -133,46 +196,6 @@ void FrameWindow::drawTitle()
   cairo_set_font_size(titleCr, 12);
   cairo_move_to(titleCr, 6, 16);
   cairo_show_text(titleCr, winName);
-}
-
-void FrameWindow::registerEvents()
-{
-  central->eventsHandler->addEventCb(
-    EventType::BUTTON_PRESS,
-    frameWindow,
-    [this](Event e) {
-      handleButtonEvent(true, e.x, e.y);
-    }
-  );
-  central->eventsHandler->addEventCb(
-    EventType::BUTTON_RELEASE,
-    frameWindow,
-    [this](Event e) {
-      handleButtonEvent(false, e.x, e.y);
-    }
-  );
-  central->eventsHandler->addEventCb(
-    EventType::MOTION,
-    frameWindow,
-    [this](Event e) {
-      handleMotionEvent(e.x, e.y);
-    }
-  );
-}
-
-void FrameWindow::handleXEvent(const XEvent evt)
-{
-  if (evt.type != Expose) {
-    return;
-  }
-
-  cairo_set_source_rgb(cr, bgColor.r, bgColor.g, bgColor.b);
-  cairo_paint(cr);
-
-  cairo_set_source_surface(cr, titleSfc, 0, 0);
-  cairo_paint(cr);
-
-  cairo_surface_flush(sfc);
 }
 
 void FrameWindow::handleMaximizeClick()
