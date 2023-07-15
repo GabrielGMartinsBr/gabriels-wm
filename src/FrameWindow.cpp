@@ -186,11 +186,8 @@ void FrameWindow::handleMaximizeClick()
 
 void FrameWindow::maximize()
 {
-  XWindowAttributes winAttrs;
-  XGetWindowAttributes(display, central->rootWindow, &winAttrs);
-
-  int fullWidth = winAttrs.width;
-  int fullHeight = winAttrs.height - 40;
+  int fullWidth = central->availWidth;
+  int fullHeight = central->availHeight;
 
   int contW = fullWidth - 2;
   int contH = fullHeight - topHeight - 1;
@@ -216,10 +213,7 @@ void FrameWindow::updateButtonsPosition()
 {
   int _width = width;
   if (maximized) {
-    // TODO: add root window dimensions on central
-    XWindowAttributes winAttrs;
-    XGetWindowAttributes(display, central->rootWindow, &winAttrs);
-    _width = winAttrs.width;
+    _width = central->availWidth;
   }
   XMoveWindow(display, closeButton->win, _width - 19, 4);
   XMoveWindow(display, maximizeButton->win, _width - 37, 4);

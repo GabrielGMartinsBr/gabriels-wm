@@ -16,13 +16,10 @@ Launcher::Launcher(Central* ct) :
   display = ct->display;
   rootWindow = ct->rootWindow;
 
-  XWindowAttributes winAttrs;
-  XGetWindowAttributes(display, rootWindow, &winAttrs);
-
-  width = winAttrs.width;
-  height = 40;
+  width = central->availWidth;
+  height = central->panelHeight;
   x = 0;
-  y = winAttrs.height - height;
+  y = central->fullHeight - height;
 
   createWindow();
   setupCairo();

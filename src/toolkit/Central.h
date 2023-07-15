@@ -13,6 +13,12 @@ struct Central {
   Display *display;
   Window rootWindow;
 
+  int fullWidth;
+  int fullHeight;
+  int panelHeight;
+  int availWidth;
+  int availHeight;
+
   Cursors *cursors;
   EventHandler *eventsHandler;
 
