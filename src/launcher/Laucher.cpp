@@ -1,6 +1,8 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
+#include <unistd.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #include "Launcher.h"
@@ -88,6 +90,18 @@ void Launcher::handleXEvent(const XEvent evt)
     case LeaveNotify:
       central->setCursor(central->cursors->Default);
       break;
+    case ButtonPress:
+      handleClick();
+      break;
+    default:
+      std::cout << evt.type << '\n';
   }
-  std::cout << evt.type << '\n';
+}
+
+void Launcher::handleClick()
+{
+  pid_t pid = fork();
+  if (pid == 0) {
+    system("xterm");
+  }
 }

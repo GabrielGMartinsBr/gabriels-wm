@@ -17,5 +17,4 @@ struct Elementor {
     unsigned long borderColor = 0x000000
   );
 
-  static Window testWindow();
 };

@@ -39,6 +39,8 @@ struct Launcher {
 
   void draw();
 
+  void handleClick();
+
   void launchProgram(const std::string &command);
 
  private:
