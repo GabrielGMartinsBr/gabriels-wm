@@ -10,8 +10,7 @@
 #include "cairo.h"
 
 Launcher::Launcher(Central* ct) :
-    bgColor("#333"),
-    startButton("Xterm")
+    bgColor("#333")
 {
   central = ct;
   display = ct->display;
@@ -27,11 +26,7 @@ Launcher::Launcher(Central* ct) :
 
   createWindow();
   setupCairo();
-
-  startButton.x = 0;
-  startButton.y = 0;
-  startButton.height = height;
-
+  createEntries();
   XMapWindow(display, window);
 }
 
@@ -70,34 +65,67 @@ void Launcher::setupCairo()
   tr = new Tracer(cr);
 }
 
-void Launcher::draw()
+void Launcher::createEntries()
 {
-  startButton.updateMetrics(cr);
-
-  startButton.draw(tr);
+  entries.push_back(
+    LauncherEntry("Xterm", "xterm")
+  );
+  entries.push_back(
+    LauncherEntry("Thunar", "thunar")
+  );
+  int x = 0;
+  for (auto& e : entries) {
+    e.x = x;
+    e.y = 0;
+    e.height = height;
+    e.updateMetrics(cr);
+    x += e.width + 3;
+  }
 }
 
-void Launcher::handleMouseMove(const XMotionEvent e)
+void Launcher::onExpose()
 {
-  if (startButton.isHover(e.x, e.y)) {
+  drawEntries();
+}
+
+void Launcher::drawEntries()
+{
+  for (auto& e : entries) {
+    e.draw(tr);
+  }
+}
+
+void Launcher::handleMouseMove(const XMotionEvent evt)
+{
+  bool isHover = false;
+  for (auto& entry : entries) {
+    if (entry.isHover(evt.x, evt.y)) {
+      isHover = true;
+      break;
+    }
+  }
+  if (isHover) {
     central->cursors->set(window, CursorKey::POINTER);
   } else {
     central->cursors->set(window, CursorKey::DEFAULT);
   }
 }
 
-void Launcher::handleClick(const XButtonEvent e)
+void Launcher::handleClick(const XButtonEvent evt)
 {
-  if (startButton.isHover(e.x, e.y)) {
-    launchProgram("xterm");
+  for (auto& entry : entries) {
+    if (entry.isHover(evt.x, evt.y)) {
+      launchProgram(entry.command.c_str());
+      break;
+    }
   }
 }
 
-void Launcher::launchProgram(const std::string& command)
+void Launcher::launchProgram(const char* command)
 {
   pid_t pid = fork();
   if (pid == 0) {
-    system("xterm");
+    system(command);
   }
 }
 
@@ -108,7 +136,7 @@ void Launcher::handleXEvent(const XEvent evt)
   }
   switch (evt.type) {
     case Expose:
-      draw();
+      onExpose();
       break;
     case EnterNotify:
       break;

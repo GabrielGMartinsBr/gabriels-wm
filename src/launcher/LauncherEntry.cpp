@@ -2,11 +2,12 @@
 
 #include "cairo.h"
 
-LauncherEntry::LauncherEntry(const char* txt) :
+LauncherEntry::LauncherEntry(const char* txt, const char* cmd) :
     bgColor("#444"),
     textColor("#eee")
 {
   text = txt;
+  command = cmd;
 }
 
 void LauncherEntry::setText(std::string value)

@@ -6,8 +6,8 @@
 #include <vector>
 
 #include "../toolkit/Central.h"
-#include "../toolkit/base/Color.h"
 #include "../toolkit/Tracer.h"
+#include "../toolkit/base/Color.h"
 #include "./LauncherEntry.h"
 #include "cairo.h"
 
@@ -27,8 +27,6 @@ struct Launcher {
   cairo_t *cr;
   Tracer *tr = nullptr;
 
-  LauncherEntry startButton;
-
   std::vector<LauncherEntry> entries;
 
   Launcher(
@@ -37,13 +35,17 @@ struct Launcher {
 
   void handleXEvent(const XEvent evt);
 
-  void draw();
-
   void handleMouseMove(const XMotionEvent evt);
 
   void handleClick(const XButtonEvent e);
 
-  void launchProgram(const std::string &command);
+  void createEntries();
+
+  void onExpose();
+
+  void drawEntries();
+
+  void launchProgram(const char* command);
 
  private:
   void createWindow();

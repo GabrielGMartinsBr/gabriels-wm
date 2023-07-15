@@ -8,6 +8,7 @@
 
 struct LauncherEntry {
   std::string text;
+  std::string command;
   Color bgColor;
   Color textColor;
 
@@ -20,7 +21,7 @@ struct LauncherEntry {
 
   cairo_text_extents_t extents;
 
-  LauncherEntry(const char* txt);
+  LauncherEntry(const char* txt, const char* cmd);
 
   void setText(std::string value);
 
