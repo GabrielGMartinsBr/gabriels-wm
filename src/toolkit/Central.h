@@ -14,10 +14,8 @@ struct Central {
   Window rootWindow;
 
   Cursors *cursors;
-
   EventHandler *eventsHandler;
 
   void init();
 
-  void setCursor(Cursor cursor);
 };

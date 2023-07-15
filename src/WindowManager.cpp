@@ -34,8 +34,7 @@ WindowManager::WindowManager(Central *ct) :
 void WindowManager::run()
 {
   Cursor cursor = XCreateFontCursor(display, XC_arrow);
-  // XDefineCursor(display, rootWindow, cursor);
-  central->setCursor(cursor);
+  central->cursors->set(rootWindow, CursorKey::DEFAULT);
 
   // Try to get window manager events
   long events = SubstructureRedirectMask | SubstructureNotifyMask;
@@ -48,9 +47,6 @@ void WindowManager::run()
   getPreExistingWindows();
 
   XEvent evt;
-
-  auto testWin = Elementor::testWindow();
-  addWindowFrame(testWin);
 
   while (true) {
     XNextEvent(display, &evt);
@@ -104,7 +100,7 @@ void WindowManager::run()
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
-        // handleIgnoredEvent(evt);
+        handleIgnoredEvent(evt);
       }
     }
   }

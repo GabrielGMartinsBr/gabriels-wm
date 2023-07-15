@@ -15,8 +15,3 @@ void Central::init()
 
   eventsHandler = new EventHandler();
 }
-
-void Central::setCursor(Cursor cursor)
-{
-  XDefineCursor(display, rootWindow, cursor);
-}
