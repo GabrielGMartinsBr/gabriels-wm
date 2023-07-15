@@ -39,7 +39,9 @@ struct Launcher {
 
   void draw();
 
-  void handleClick();
+  void handleMouseMove(const XMotionEvent evt);
+
+  void handleClick(const XButtonEvent e);
 
   void launchProgram(const std::string &command);
 

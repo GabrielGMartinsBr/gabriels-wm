@@ -33,12 +33,18 @@ void LauncherEntry::draw(Tracer* tr)
   cairo_t* cr = tr->cr;
   updateMetrics(cr);
   tr->setColor(bgColor);
-  cairo_rectangle(cr, 0, 0, width, height);
+  cairo_rectangle(cr, x, y, width, height);
   cairo_fill(cr);
 
   tr->setColor(textColor);
-  int x = px;
-  int y = (height + extents.height) / 2.;
-  cairo_move_to(cr, x, y);
+  int tx = x + px;
+  int ty = y + (height + extents.height) / 2.;
+  cairo_move_to(cr, tx, ty);
   cairo_show_text(cr, text.c_str());
+}
+
+bool LauncherEntry::isHover(int _x, int _y)
+{
+  return _x > x
+         && _x < x + width;
 }

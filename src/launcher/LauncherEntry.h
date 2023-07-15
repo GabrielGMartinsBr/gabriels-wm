@@ -11,6 +11,8 @@ struct LauncherEntry {
   Color bgColor;
   Color textColor;
 
+  int x;
+  int y;
   int width;
   int height;
 
@@ -25,4 +27,6 @@ struct LauncherEntry {
   void updateMetrics(cairo_t* cr);
 
   void draw(Tracer* tr);
+
+  bool isHover(int x, int y);
 };

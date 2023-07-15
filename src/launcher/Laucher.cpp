@@ -11,7 +11,7 @@
 
 Launcher::Launcher(Central* ct) :
     bgColor("#333"),
-    startButton("Iniciar")
+    startButton("Xterm")
 {
   central = ct;
   display = ct->display;
@@ -28,6 +28,8 @@ Launcher::Launcher(Central* ct) :
   createWindow();
   setupCairo();
 
+  startButton.x = 0;
+  startButton.y = 0;
   startButton.height = height;
 
   XMapWindow(display, window);
@@ -75,6 +77,30 @@ void Launcher::draw()
   startButton.draw(tr);
 }
 
+void Launcher::handleMouseMove(const XMotionEvent e)
+{
+  if (startButton.isHover(e.x, e.y)) {
+    central->cursors->set(window, CursorKey::POINTER);
+  } else {
+    central->cursors->set(window, CursorKey::DEFAULT);
+  }
+}
+
+void Launcher::handleClick(const XButtonEvent e)
+{
+  if (startButton.isHover(e.x, e.y)) {
+    launchProgram("xterm");
+  }
+}
+
+void Launcher::launchProgram(const std::string& command)
+{
+  pid_t pid = fork();
+  if (pid == 0) {
+    system("xterm");
+  }
+}
+
 void Launcher::handleXEvent(const XEvent evt)
 {
   if (evt.xany.window != window) {
@@ -85,23 +111,16 @@ void Launcher::handleXEvent(const XEvent evt)
       draw();
       break;
     case EnterNotify:
-      central->setCursor(central->cursors->Pointer);
       break;
     case LeaveNotify:
-      central->setCursor(central->cursors->Default);
+      break;
+    case MotionNotify:
+      handleMouseMove(evt.xmotion);
       break;
     case ButtonPress:
-      handleClick();
+      handleClick(evt.xbutton);
       break;
     default:
       std::cout << evt.type << '\n';
-  }
-}
-
-void Launcher::handleClick()
-{
-  pid_t pid = fork();
-  if (pid == 0) {
-    system("xterm");
   }
 }
