@@ -32,7 +32,6 @@ int Compositor::run()
                 | PropertyChangeMask
                 | ButtonPressMask;
   XSelectInput(display, root, events);
-  XSync(display, false);
 
   w = 600;
   h = 600;
@@ -40,10 +39,14 @@ int Compositor::run()
   Window srcWindow = XCreateSimpleWindow(
     display, root, 10, 10, 635, 620, 0, 0, 0x44ffaa
   );
+  XSelectInput(display, srcWindow, ButtonPressMask);
 
   Window dstWindow = XCreateSimpleWindow(
     display, root, 655, 10, 635, 620, 0, 0, 0x44aaff
   );
+  XSelectInput(display, dstWindow, ButtonPressMask);
+
+  XSync(display, false);
 
   XMapWindow(display, srcWindow);
   XMapWindow(display, dstWindow);
@@ -90,6 +93,8 @@ int Compositor::run()
   //   );
 
   render();
+  Log::out() << "srcWindow: " << srcWindow;
+  Log::out() << "dstWindow: " << dstWindow;
 
   //   ----------------------------------------
 
@@ -97,8 +102,18 @@ int Compositor::run()
   while (true) {
     XNextEvent(display, &evt);
 
-    if (evt.type == ButtonPress) {
-      drawOnSrc();
+    switch (evt.type) {
+      case ButtonPress: {
+        Log::out() << evt.xbutton.window;
+        Window clickedWindow = evt.xbutton.window;
+        if (clickedWindow == srcWindow) {
+          drawOnSrc();
+        }
+        if (clickedWindow == dstWindow) {
+          render();
+        }
+        break;
+      }
     }
   }
 
