@@ -123,6 +123,8 @@ void Launcher::launchProgram(const char* command)
   pid_t pid = fork();
   if (pid == 0) {
     system(command);
+    // execl("/path/to/your/program", "/path/to/your/program", NULL);
+    exit(0);
   }
 }
 
