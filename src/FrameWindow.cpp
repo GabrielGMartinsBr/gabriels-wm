@@ -140,7 +140,7 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
   if (closeButton.isHover(evt.x, evt.y)) {
-    XKillClient(display, contentWindow);
+    closeWindow();
     return;
   }
 
@@ -271,6 +271,19 @@ void FrameWindow::restoreSize()
   XMoveResizeWindow(display, contentWindow, borderWidth, topHeight, cWidth, cHeight);
   XSetWindowBorderWidth(display, frameWindow, 1);
   maximized = false;
+}
+
+void FrameWindow::closeWindow()
+{
+  Atom wmDeleteWindow = XInternAtom(display, "WM_DELETE_WINDOW", false);
+  XEvent event;
+  event.type = ClientMessage;
+  event.xclient.window = contentWindow;
+  event.xclient.message_type = XInternAtom(display, "WM_PROTOCOLS", false);
+  event.xclient.format = 32;
+  event.xclient.data.l[0] = wmDeleteWindow;
+  event.xclient.data.l[1] = CurrentTime;
+  XSendEvent(display, contentWindow, false, NoEventMask, &event);
 }
 
 void FrameWindow::startDrag(int _x, int _y)

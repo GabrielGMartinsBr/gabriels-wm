@@ -60,6 +60,7 @@ class FrameWindow {
   void handleMaximizeClick();
   void maximize();
   void restoreSize();
+  void closeWindow();
 
   void handleXEvent(const XEvent evt);
 
