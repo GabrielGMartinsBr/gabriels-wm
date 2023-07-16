@@ -128,21 +128,33 @@ void WindowManager::handleConfigureRequest(const XConfigureRequestEvent event)
   changes.x = event.x;
   changes.y = event.y;
   changes.width = event.width;
+  if (changes.width > 800) {
+    changes.width = 800;
+  }
   changes.height = event.height;
+  if (changes.height > 500) {
+    changes.height = 500;
+  }
   changes.border_width = 0;
   changes.sibling = event.above;
   changes.stack_mode = event.detail;
-  XConfigureWindow(display, event.window, event.value_mask | CWX | CWY | CWBorderWidth, &changes);
+  XConfigureWindow(
+    display,
+    event.window,
+    event.value_mask | CWX | CWY | CWBorderWidth | CWWidth | CWHeight,
+    &changes
+  );
 }
 
 void WindowManager::handleMapRequest(const XMapRequestEvent event)
 {
   // std::cout << "XMapRequestEvent:" << event.window << '\n';
-  XWindowChanges changes;
-  changes.x = 300;
-  changes.y = 60;
-  changes.border_width = 0;
-  XConfigureWindow(display, event.window, CWX | CWY | CWBorderWidth, &changes);
+  // XWindowChanges changes;
+  // changes.x = 300;
+  // changes.y = 60;
+  // changes.width = event.window
+  // changes.border_width = 0;
+  // XConfigureWindow(display, event.window, CWX | CWY | CWBorderWidth, &changes);
   addWindowFrame(event.window);
   XMapWindow(display, event.window);
 }

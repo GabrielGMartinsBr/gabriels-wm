@@ -201,7 +201,12 @@ void FrameWindow::getWinAttrs()
 void FrameWindow::drawTitle()
 {
   cairo_set_source_rgb(cr, 1.0, 1.0, 1.0);
-  cairo_select_font_face(cr, "Arial", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+  cairo_select_font_face(
+    cr,
+    "Arial",
+    CAIRO_FONT_SLANT_NORMAL,
+    CAIRO_FONT_WEIGHT_BOLD
+  );
   cairo_set_font_size(cr, 12);
   cairo_move_to(cr, 6, 16);
   cairo_show_text(cr, winName);
@@ -268,7 +273,14 @@ void FrameWindow::restoreSize()
   int cWidth = width - borderWidth * 2;
   int cHeight = height - topHeight - borderWidth;
   XMoveResizeWindow(display, frameWindow, x, y, width, height);
-  XMoveResizeWindow(display, contentWindow, borderWidth, topHeight, cWidth, cHeight);
+  XMoveResizeWindow(
+    display,
+    contentWindow,
+    borderWidth,
+    topHeight,
+    cWidth,
+    cHeight
+  );
   XSetWindowBorderWidth(display, frameWindow, 1);
   maximized = false;
 }
