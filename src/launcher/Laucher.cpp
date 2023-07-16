@@ -46,7 +46,8 @@ void Launcher::createWindow()
                   | ButtonReleaseMask
                   | EnterWindowMask
                   | LeaveWindowMask
-                  | PointerMotionMask;
+                  | PointerMotionMask
+                  | VisibilityChangeMask;
 
   XSelectInput(display, window, evtMasks);
 }
@@ -130,6 +131,13 @@ void Launcher::launchProgram(const char* command)
 
 void Launcher::handleXEvent(const XEvent evt)
 {
+  if (evt.type == VisibilityNotify) {
+    XVisibilityEvent e = evt.xvisibility;
+    if (e.window == window && e.state) {
+      XRaiseWindow(display, window);
+    }
+    return;
+  }
   if (evt.xany.window != window) {
     return;
   }
