@@ -51,6 +51,11 @@ FrameWindow::FrameWindow(
 
   XMapWindow(display, frameWindow);
 
+  XGrabButton(
+    display, Button1, AnyModifier, contentWindow, true,
+    ButtonPressMask, GrabModeAsync, GrabModeAsync, None, None
+  );
+
   setupCairo();
   getWinAttrs();
 }
@@ -128,6 +133,16 @@ void FrameWindow::onExpose()
 
 void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
 {
+  if (
+    evt.window != frameWindow
+    && evt.window != contentWindow
+  ) {
+    return;
+  }
+
+  XRaiseWindow(display, frameWindow);
+  XSetInputFocus(display, contentWindow, RevertToPointerRoot, CurrentTime);
+
   if (evt.window != frameWindow) {
     return;
   }
@@ -143,12 +158,7 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     closeWindow();
     return;
   }
-
-  XRaiseWindow(display, frameWindow);
-
-  if (evt.window == frameWindow) {
-    startDrag(evt.x, evt.y);
-  }
+  startDrag(evt.x, evt.y);
 }
 
 void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
