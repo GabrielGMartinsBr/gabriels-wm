@@ -10,7 +10,7 @@
 #include "events/EventHandler.h"
 
 struct Central {
-  Display *display;
+  Display *dpy;
   Window rootWindow;
 
   int fullWidth;

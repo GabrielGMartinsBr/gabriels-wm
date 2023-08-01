@@ -13,7 +13,7 @@ Launcher::Launcher(Central* ct) :
     bgColor("#333")
 {
   central = ct;
-  display = ct->display;
+  display = ct->dpy;
   rootWindow = ct->rootWindow;
 
   width = central->availWidth;

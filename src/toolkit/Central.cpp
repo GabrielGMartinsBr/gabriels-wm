@@ -4,15 +4,15 @@
 
 void Central::init()
 {
-  display = XOpenDisplay(nullptr);
-  if (display == nullptr) {
+  dpy = XOpenDisplay(nullptr);
+  if (dpy == nullptr) {
     throw std::runtime_error("failed to open x display");
   }
 
-  rootWindow = DefaultRootWindow(display);
+  rootWindow = DefaultRootWindow(dpy);
 
   XWindowAttributes winAttrs;
-  XGetWindowAttributes(display, rootWindow, &winAttrs);
+  XGetWindowAttributes(dpy, rootWindow, &winAttrs);
   fullWidth = winAttrs.width;
   fullHeight = winAttrs.height;
 
@@ -20,7 +20,7 @@ void Central::init()
   availWidth = fullWidth;
   availHeight = fullHeight - panelHeight;
 
-  cursors = new Cursors(display);
+  cursors = new Cursors(dpy);
 
   eventsHandler = new EventHandler();
 }

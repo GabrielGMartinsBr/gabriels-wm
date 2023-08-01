@@ -21,7 +21,7 @@ FrameWindow::FrameWindow(
     minimizeButton(0xefdf00)
 {
   central = ct;
-  display = ct->display;
+  display = ct->dpy;
   contentWindow = cWin;
 
   XWindowAttributes winAttrs;

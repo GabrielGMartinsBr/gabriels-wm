@@ -12,7 +12,7 @@ Button::Button(
 )
 {
   central = c;
-  Display* dpy = central->display;
+  Display* dpy = central->dpy;
   win = XCreateSimpleWindow(
     dpy, parent, x, y, w, h, 0,
     borderColor, bgColor
@@ -46,8 +46,8 @@ void Button::setBackground(unsigned long color)
 {
   XSetWindowAttributes attributes;
   attributes.background_pixel = color;
-  XChangeWindowAttributes(central->display, win, CWBackPixel, &attributes);
-  XClearWindow(central->display, win);
+  XChangeWindowAttributes(central->dpy, win, CWBackPixel, &attributes);
+  XClearWindow(central->dpy, win);
 }
 
 void Button::onClick(const EventCallback& cb)
