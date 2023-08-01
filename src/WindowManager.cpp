@@ -3,9 +3,6 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
-#include <X11/extensions/Xcomposite.h>
-#include <X11/extensions/Xdamage.h>
-#include <X11/extensions/Xrender.h>
 
 #include <iostream>
 
@@ -37,47 +34,12 @@ WindowManager::WindowManager(Central *ct) :
 
 WindowManager::~WindowManager()
 {
-  // XFreePixmap(display, backBuffer);
   XCloseDisplay(display);
   Log::out() << "Closing Window Manager";
 }
 
 void WindowManager::run()
 {
-  // XCompositeRedirectSubwindows(
-  //   display,
-  //   rootWindow,
-  //   CompositeRedirectManual
-  // );
-  // XSync(display, false);
-
-  // renderWindow = XCreateSimpleWindow(
-  //   display,
-  //   rootWindow,
-  //   0, 0,
-  //   central->fullWidth, central->availHeight,
-  //   0, 0, 0
-  // );
-  // XMapWindow(display, renderWindow);
-
-  // XRenderPictureAttributes pa;
-  // pa.subwindow_mode = IncludeInferiors;  // Don't clip child widgets
-
-  // XWindowAttributes attr;
-  // XGetWindowAttributes(display, rootWindow, &attr);
-  // XRenderPictFormat *format = XRenderFindVisualFormat(
-  //   display,
-  //   attr.visual
-  // );
-
-  // Picture picture = XRenderCreatePicture(
-  //   display,
-  //   rootWindow,
-  //   format,
-  //   CPSubwindowMode,
-  //   &pa
-  // );
-
   Cursor cursor = XCreateFontCursor(display, XC_arrow);
   central->cursors->set(rootWindow, CursorKey::DEFAULT);
 
@@ -96,50 +58,11 @@ void WindowManager::run()
 
   getPreExistingWindows();
 
-  // int damageEventBase;
-  // int damageErrorBase;
-  // if (!XDamageQueryExtension(display, &damageEventBase, &damageErrorBase)) {
-  //   std::cerr << "No damage extension\n";
-  // }
-
-  // Damage damageHandle = XDamageCreate(
-  //   display,
-  //   rootWindow,
-  //   XDamageReportNonEmpty
-  // );
-
-  // int screen = DefaultScreen(display);
-  // Pixmap rootPixmap = XCreatePixmap(
-  //   display,
-  //   rootWindow,
-  //   central->fullWidth, central->fullHeight,
-  //   DefaultDepth(display, screen)
-  // );
-  // Picture rootBuffer = XRenderCreatePicture(
-  //   display,
-  //   rootPixmap,
-  //   XRenderFindVisualFormat(
-  //     display,
-  //     DefaultVisual(display, screen)
-  //   ),
-  //   0,
-  //   NULL
-  // );
-  // XFreePixmap(display, rootPixmap);
-
   XFlush(display);
 
   XEvent evt;
   while (true) {
     XNextEvent(display, &evt);
-
-    // if (
-    //   evt.type != MotionNotify
-    // ) {
-    //   Log::out() << "-------";
-    //   Log::out() << "name: " << getEventName(evt);
-    //   Log::out() << "-------";
-    // }
 
     launcher.handleXEvent(evt);
     for (auto &f : framesMap) {
@@ -167,9 +90,6 @@ void WindowManager::run()
         handleReparentNotify(evt.xreparent);
         break;
       case Expose:
-        // if (evt.xexpose.window == rootWindow) {
-        //   Log::out() << "Expose root window";
-        // }
         break;
       case ButtonPress:
         std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
@@ -186,20 +106,7 @@ void WindowManager::run()
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
-        // if (evt.type == damageEventBase + XDamageNotify) {
-        //   picture = XRenderCreatePicture(
-        //     display,
-        //     rootPixmap,
-        //     format,
-        //     CPSubwindowMode,
-        //     &pa
-        //   );
-
-        //   XFlush(display);
-        //   std::cout << "Damage!\n";
-        //   break;
-        // }
-        // handleIgnoredEvent(evt);
+        handleIgnoredEvent(evt);
       }
     }
   }
