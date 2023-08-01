@@ -1,5 +1,7 @@
 #include "WindowManager.h"
 #include "toolkit/Elementor.h"
+// #include "./composite/CompositeTest.h"
+
 
 int main(int, char **)
 {
@@ -7,6 +9,8 @@ int main(int, char **)
 
   WindowManager wm(&Elementor::central);
   wm.run();
-
   return 0;
+
+  // Compositor compositor;
+  // return compositor.run();
 }

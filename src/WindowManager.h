@@ -14,6 +14,7 @@
 class WindowManager {
  public:
   WindowManager(Central *ct);
+  ~WindowManager();
 
   void run();
 

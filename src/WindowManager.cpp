@@ -3,10 +3,14 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
+#include <X11/extensions/Xcomposite.h>
+#include <X11/extensions/Xdamage.h>
+#include <X11/extensions/Xrender.h>
 
 #include <iostream>
 
 #include "FrameWindow.h"
+#include "Log.hpp"
 #include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
 #include "utils/codes.h"
@@ -27,17 +31,63 @@ WindowManager::WindowManager(Central *ct) :
     launcher(ct)
 {
   central = ct;
-  display = central->display;
+  display = central->dpy;
   rootWindow = central->rootWindow;
+}
+
+WindowManager::~WindowManager()
+{
+  // XFreePixmap(display, backBuffer);
+  XCloseDisplay(display);
+  Log::out() << "Closing Window Manager";
 }
 
 void WindowManager::run()
 {
+  // XCompositeRedirectSubwindows(
+  //   display,
+  //   rootWindow,
+  //   CompositeRedirectManual
+  // );
+  // XSync(display, false);
+
+  // renderWindow = XCreateSimpleWindow(
+  //   display,
+  //   rootWindow,
+  //   0, 0,
+  //   central->fullWidth, central->availHeight,
+  //   0, 0, 0
+  // );
+  // XMapWindow(display, renderWindow);
+
+  // XRenderPictureAttributes pa;
+  // pa.subwindow_mode = IncludeInferiors;  // Don't clip child widgets
+
+  // XWindowAttributes attr;
+  // XGetWindowAttributes(display, rootWindow, &attr);
+  // XRenderPictFormat *format = XRenderFindVisualFormat(
+  //   display,
+  //   attr.visual
+  // );
+
+  // Picture picture = XRenderCreatePicture(
+  //   display,
+  //   rootWindow,
+  //   format,
+  //   CPSubwindowMode,
+  //   &pa
+  // );
+
   Cursor cursor = XCreateFontCursor(display, XC_arrow);
   central->cursors->set(rootWindow, CursorKey::DEFAULT);
 
   // Try to get window manager events
-  long events = SubstructureRedirectMask | SubstructureNotifyMask;
+  long events = SubstructureRedirectMask
+                | SubstructureNotifyMask
+                | StructureNotifyMask
+                | ExposureMask
+                | PropertyChangeMask
+                | ButtonPressMask;
   XSelectInput(display, rootWindow, events);
   XSetErrorHandler(&onWindowManagerDetected);
   XSync(display, false);
@@ -46,10 +96,51 @@ void WindowManager::run()
 
   getPreExistingWindows();
 
-  XEvent evt;
+  // int damageEventBase;
+  // int damageErrorBase;
+  // if (!XDamageQueryExtension(display, &damageEventBase, &damageErrorBase)) {
+  //   std::cerr << "No damage extension\n";
+  // }
 
+  // Damage damageHandle = XDamageCreate(
+  //   display,
+  //   rootWindow,
+  //   XDamageReportNonEmpty
+  // );
+
+  // int screen = DefaultScreen(display);
+  // Pixmap rootPixmap = XCreatePixmap(
+  //   display,
+  //   rootWindow,
+  //   central->fullWidth, central->fullHeight,
+  //   DefaultDepth(display, screen)
+  // );
+  // Picture rootBuffer = XRenderCreatePicture(
+  //   display,
+  //   rootPixmap,
+  //   XRenderFindVisualFormat(
+  //     display,
+  //     DefaultVisual(display, screen)
+  //   ),
+  //   0,
+  //   NULL
+  // );
+  // XFreePixmap(display, rootPixmap);
+
+  XFlush(display);
+
+  XEvent evt;
   while (true) {
     XNextEvent(display, &evt);
+
+    // if (
+    //   evt.type != MotionNotify
+    // ) {
+    //   Log::out() << "-------";
+    //   Log::out() << "name: " << getEventName(evt);
+    //   Log::out() << "-------";
+    // }
+
     launcher.handleXEvent(evt);
     for (auto &f : framesMap) {
       f.second->handleXEvent(evt);
@@ -76,21 +167,13 @@ void WindowManager::run()
         handleReparentNotify(evt.xreparent);
         break;
       case Expose:
-        // if (framesMap.count(evt.xexpose.window)) {
-        //   framesMap[evt.xexpose.window]->handleXEvent(evt);
-        //   break;
+        // if (evt.xexpose.window == rootWindow) {
+        //   Log::out() << "Expose root window";
         // }
-        // std::cout << "======================================\n";
-        // // std::cout << "display: " << evt.xexpose.display << '\n';
-        // // std::cout << "window: " << evt.xexpose.window << '\n';
-        // std::cout << "x: " << evt.xexpose.x << '\n';
-        // std::cout << "y: " << evt.xexpose.y << '\n';
-        // std::cout << "width: " << evt.xexpose.width << '\n';
-        // std::cout << "height: " << evt.xexpose.height << '\n';
-        // // std::cout << "count: " << evt.xexpose.count << '\n';
-        // std::cout << "======================================\n";
         break;
       case ButtonPress:
+        std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
+
         handleButtonPress(evt.xbutton);
         break;
       case ButtonRelease:
@@ -103,13 +186,23 @@ void WindowManager::run()
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
+        // if (evt.type == damageEventBase + XDamageNotify) {
+        //   picture = XRenderCreatePicture(
+        //     display,
+        //     rootPixmap,
+        //     format,
+        //     CPSubwindowMode,
+        //     &pa
+        //   );
+
+        //   XFlush(display);
+        //   std::cout << "Damage!\n";
+        //   break;
+        // }
         // handleIgnoredEvent(evt);
       }
     }
   }
-
-  XCloseDisplay(display);
-  std::cout << "Closing Window Manager...\n";
 }
 
 //
@@ -148,13 +241,6 @@ void WindowManager::handleConfigureRequest(const XConfigureRequestEvent event)
 
 void WindowManager::handleMapRequest(const XMapRequestEvent event)
 {
-  // std::cout << "XMapRequestEvent:" << event.window << '\n';
-  // XWindowChanges changes;
-  // changes.x = 300;
-  // changes.y = 60;
-  // changes.width = event.window
-  // changes.border_width = 0;
-  // XConfigureWindow(display, event.window, CWX | CWY | CWBorderWidth, &changes);
   addWindowFrame(event.window);
   XMapWindow(display, event.window);
 }
@@ -209,7 +295,7 @@ void WindowManager::handleIgnoredEvent(const XEvent &event)
 
 void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
 {
-  Display *d = Elementor::central.display;
+  Display *d = Elementor::central.dpy;
 
   if (isPreExisting) {
     XWindowAttributes winAttrs;
@@ -229,7 +315,7 @@ void WindowManager::addWindowFrame(Window window, Bool isPreExisting)
   framesMap[frame->frameWindow] = frame;
 
   std::cout << "FrameWindow: " << frame->frameWindow << " | "
-            << "FramedWindow: " << window << '\n';
+            << "ContentWindow: " << window << '\n';
 }
 
 void WindowManager::unFrame(const XUnmapEvent &evt)
@@ -257,7 +343,7 @@ void WindowManager::unFrame(const XUnmapEvent &evt)
 
 void WindowManager::getPreExistingWindows()
 {
-  Display *d = Elementor::central.display;
+  Display *d = Elementor::central.dpy;
   Window root = Elementor::central.rootWindow;
   XGrabServer(d);
 
