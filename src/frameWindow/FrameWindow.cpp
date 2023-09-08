@@ -5,12 +5,11 @@
 
 #include <iostream>
 
+#include "../toolkit/base/Color.h"
+#include "../toolkit/utils/WindowUtils.h"
 #include "FrameUtils.hpp"
-#include "Log.hpp"
 #include "cairo-xlib.h"
 #include "cairo.h"
-#include "toolkit/base/Color.h"
-#include "toolkit/utils/WindowUtils.h"
 
 FrameWindow::FrameWindow(
   Central* ct,
@@ -142,8 +141,6 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
 
-  Log::out() << evt.y;
-
   XRaiseWindow(display, frameWindow);
   XSetInputFocus(display, contentWindow, RevertToPointerRoot, CurrentTime);
 
@@ -165,7 +162,9 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
 
   // Drag
   if (
-    !maximized && evt.y < topHeight
+    !maximized
+    && evt.y > borderWidth
+    && evt.y < topHeight
   ) {
     startDrag(evt.x, evt.y);
   }

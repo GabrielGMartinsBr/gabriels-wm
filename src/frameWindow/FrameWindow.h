@@ -4,9 +4,9 @@
 
 #include <cmath>
 
-#include "toolkit/Central.h"
-#include "toolkit/Tracer.h"
-#include "toolkit/base/Color.h"
+#include "../toolkit/Central.h"
+#include "../toolkit/Tracer.h"
+#include "../toolkit/base/Color.h"
 
 // TODO: Create Color Struct
 // TODO: Create Small Title surface
@@ -101,7 +101,7 @@ class FrameWindow {
   void stopDrag(int x, int y);
 
   bool setPointerCursor(int x, int y);
-  
+
   bool setResizeCursor(int x, int y);
 
   void setCursor(CursorKey k);
