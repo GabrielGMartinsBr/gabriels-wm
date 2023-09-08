@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "Log.hpp"
 #include "cairo-xlib.h"
 #include "cairo.h"
 #include "toolkit/base/Color.h"
@@ -140,6 +141,8 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
 
+  Log::out()  << evt.y;
+
   XRaiseWindow(display, frameWindow);
   XSetInputFocus(display, contentWindow, RevertToPointerRoot, CurrentTime);
 
@@ -158,7 +161,9 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     closeWindow();
     return;
   }
-  startDrag(evt.x, evt.y);
+  if (!maximized) {
+    startDrag(evt.x, evt.y);
+  }
 }
 
 void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
