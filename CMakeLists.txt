@@ -9,7 +9,8 @@ include(CTest)
 enable_testing()
 
 # List all source files
-file(GLOB_RECURSE source_files src/*.cpp)
+file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
+
 
 # Create the executable target
 add_executable(${PROJECT_NAME} ${source_files})

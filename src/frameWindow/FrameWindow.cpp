@@ -7,7 +7,6 @@
 
 #include "../toolkit/base/Color.h"
 #include "../toolkit/utils/WindowUtils.h"
-#include "FrameUtils.hpp"
 #include "cairo-xlib.h"
 #include "cairo.h"
 
@@ -30,8 +29,8 @@ FrameWindow::FrameWindow(
 
   x = winAttrs.x;
   y = winAttrs.y;
-  width = winAttrs.width + borderWidth * 2;
-  height = winAttrs.height + topHeight + borderWidth;
+  width = winAttrs.width + border * 2;
+  height = winAttrs.height + header + border;
 
   frameWindow = XCreateSimpleWindow(
     display, central->rootWindow,
@@ -48,7 +47,7 @@ FrameWindow::FrameWindow(
                      | EnterWindowMask;
   XSelectInput(display, frameWindow, frameEvents);
 
-  XReparentWindow(display, cWin, frameWindow, borderWidth, topHeight);
+  XReparentWindow(display, cWin, frameWindow, border, header);
 
   XMapWindow(display, frameWindow);
 
@@ -66,7 +65,7 @@ void FrameWindow::setupCairo()
   int screen = DefaultScreen(display);
   Visual* visual = DefaultVisual(display, screen);
   sfc = cairo_xlib_surface_create(
-    display, frameWindow, visual, width, topHeight
+    display, frameWindow, visual, width, header
   );
   cr = cairo_create(sfc);
   tr = new Tracer(cr);
@@ -108,7 +107,7 @@ void FrameWindow::onExpose()
     cairo_xlib_surface_set_size(
       sfc,
       central->availWidth,
-      topHeight
+      header
     );
     isCairoMaximized = true;
   }
@@ -116,7 +115,7 @@ void FrameWindow::onExpose()
     cairo_xlib_surface_set_size(
       sfc,
       width,
-      topHeight
+      header
     );
     isCairoMaximized = false;
   }
@@ -163,8 +162,8 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
   // Drag
   if (
     !maximized
-    && evt.y > borderWidth
-    && evt.y < topHeight
+    && evt.y > border
+    && evt.y < header
   ) {
     startDrag(evt.x, evt.y);
   }
@@ -247,7 +246,7 @@ void FrameWindow::drawFrameButtons()
 
   int radius = size / 2;
   int x = w - (len * fSize) + radius;
-  int y = topHeight / 2;
+  int y = header / 2;
   minimizeButton.x = x;
   minimizeButton.y = y;
   minimizeButton.radius = radius;
@@ -280,24 +279,24 @@ void FrameWindow::maximize()
   int fullHeight = central->availHeight;
 
   int contW = fullWidth - 2;
-  int contH = fullHeight - topHeight - 1;
+  int contH = fullHeight - header - 1;
 
   XSetWindowBorderWidth(display, frameWindow, 0);
   XMoveResizeWindow(display, frameWindow, 0, 0, fullWidth, fullHeight);
-  XMoveResizeWindow(display, contentWindow, 1, topHeight, contW, contH);
+  XMoveResizeWindow(display, contentWindow, 1, header, contW, contH);
   maximized = true;
 }
 
 void FrameWindow::restoreSize()
 {
-  int cWidth = width - borderWidth * 2;
-  int cHeight = height - topHeight - borderWidth;
+  int cWidth = width - border * 2;
+  int cHeight = height - header - border;
   XMoveResizeWindow(display, frameWindow, x, y, width, height);
   XMoveResizeWindow(
     display,
     contentWindow,
-    borderWidth,
-    topHeight,
+    border,
+    header,
     cWidth,
     cHeight
   );
@@ -385,32 +384,30 @@ bool FrameWindow::setPointerCursor(int _x, int _y)
 
 bool FrameWindow::setResizeCursor(int _x, int _y)
 {
-  ResizeDirection resizeDirection = FrameUtils::getResizeDirection(
-    this, _x, _y
-  );
+  ResizeDir resizeDirection = getResizeDirection(_x, _y);
   switch (resizeDirection) {
-    case ResizeDirection::LEFT:
+    case ResizeDir::LEFT:
       setCursor(CursorKey::RESIZE_LEFT);
       break;
-    case ResizeDirection::RIGHT:
+    case ResizeDir::RIGHT:
       setCursor(CursorKey::RESIZE_RIGHT);
       break;
-    case ResizeDirection::UP:
+    case ResizeDir::UP:
       setCursor(CursorKey::RESIZE_UP);
       break;
-    case ResizeDirection::DOWN:
+    case ResizeDir::DOWN:
       setCursor(CursorKey::RESIZE_DOWN);
       break;
-    case ResizeDirection::UP_LEFT:
+    case ResizeDir::UP_LEFT:
       setCursor(CursorKey::RESIZE_UP_LEFT);
       break;
-    case ResizeDirection::UP_RIGHT:
+    case ResizeDir::UP_RIGHT:
       setCursor(CursorKey::RESIZE_UP_RIGHT);
       break;
-    case ResizeDirection::DOWN_LEFT:
+    case ResizeDir::DOWN_LEFT:
       setCursor(CursorKey::RESIZE_DOWN_LEFT);
       break;
-    case ResizeDirection::DOWN_RIGHT:
+    case ResizeDir::DOWN_RIGHT:
       setCursor(CursorKey::RESIZE_DOWN_RIGHT);
       break;
     default: {

@@ -7,12 +7,13 @@
 #include "../toolkit/Central.h"
 #include "../toolkit/Tracer.h"
 #include "../toolkit/base/Color.h"
+#include "FrameWindowResize.hpp"
 
 // TODO: Create Color Struct
 // TODO: Create Small Title surface
 // TODO:
 
-class FrameWindow {
+class FrameWindow : FrameWindowResize {
   struct CircleButton {
     int x;
     int y;
@@ -29,16 +30,14 @@ class FrameWindow {
   };
 
  public:
-  static const int topHeight = 24;
-  static const int borderWidth = 3;
   static const unsigned long BG_COLOR_HEX = 0x3f7faf;
 
   Color bgColor;
 
   int x;
   int y;
-  int width;
-  int height;
+  // int width;
+  // int height;
   bool maximized;
 
   const char *winName;
