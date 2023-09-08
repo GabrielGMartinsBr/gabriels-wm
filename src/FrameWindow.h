@@ -99,4 +99,6 @@ class FrameWindow {
   void startDrag(int x, int y);
   void updateDrag(int x, int y);
   void stopDrag(int x, int y);
+
+  void setCursor(CursorKey k);
 };

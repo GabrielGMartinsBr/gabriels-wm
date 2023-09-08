@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "FrameUtils.hpp"
 #include "Log.hpp"
 #include "cairo-xlib.h"
 #include "cairo.h"
@@ -141,7 +142,7 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
 
-  Log::out()  << evt.y;
+  Log::out() << evt.y;
 
   XRaiseWindow(display, frameWindow);
   XSetInputFocus(display, contentWindow, RevertToPointerRoot, CurrentTime);
@@ -161,7 +162,11 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     closeWindow();
     return;
   }
-  if (!maximized) {
+
+  // Drag
+  if (
+    !maximized && evt.y < topHeight
+  ) {
     startDrag(evt.x, evt.y);
   }
 }
@@ -188,12 +193,38 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
     || closeButton.isHover(evt.x, evt.y)
   ) {
     if (!cursorChanged) {
-      central->cursors->set(frameWindow, CursorKey::POINTER);
+      setCursor(CursorKey::POINTER);
       cursorChanged = true;
     }
     return;
   }
+
+  ResizeDirection resizeDirection = FrameUtils::getResizeDirection(
+    this, evt.x, evt.y
+  );
+  if (resizeDirection != ResizeDirection::NONE) {
+    cursorChanged = true;
+    switch (resizeDirection) {
+      case ResizeDirection::LEFT:
+        setCursor(CursorKey::RESIZE_L);
+        break;
+      case ResizeDirection::RIGHT:
+        setCursor(CursorKey::RESIZE_R);
+        break;
+      case ResizeDirection::UP:
+        setCursor(CursorKey::RESIZE_U);
+        break;
+      case ResizeDirection::DOWN:
+        setCursor(CursorKey::RESIZE_D);
+        break;
+      default: {
+        cursorChanged = false;
+      }
+    }
+    return;
+  }
   if (cursorChanged) {
+    setCursor(CursorKey::DEFAULT);
     central->cursors->set(frameWindow, CursorKey::DEFAULT);
     cursorChanged = false;
   }
@@ -358,4 +389,9 @@ bool FrameWindow::CircleButton::isHover(int _x, int _y)
     std::pow(_x - x, 2) + std::pow(_y - y, 2)
   );
   return distance <= radius;
+}
+
+void FrameWindow::setCursor(CursorKey k)
+{
+  central->cursors->set(frameWindow, k);
 }

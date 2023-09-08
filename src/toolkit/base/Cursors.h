@@ -5,7 +5,17 @@
 
 enum CursorKey {
   DEFAULT,
-  POINTER
+  POINTER,
+  RESIZE_L,
+  RESIZE_R,
+  RESIZE_U,
+  RESIZE_D,
+  RESIZE_H,
+  RESIZE_V,
+  RESIZE_TL,
+  RESIZE_TR,
+  RESIZE_BL,
+  RESIZE_BR,
 };
 
 struct Cursors {

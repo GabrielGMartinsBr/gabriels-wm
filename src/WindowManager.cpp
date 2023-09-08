@@ -92,7 +92,7 @@ void WindowManager::run()
       case Expose:
         break;
       case ButtonPress:
-        std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
+        // std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
 
         handleButtonPress(evt.xbutton);
         break;
@@ -106,7 +106,7 @@ void WindowManager::run()
         handleDestroyNotify(evt.xdestroywindow);
         break;
       default: {
-        handleIgnoredEvent(evt);
+        // handleIgnoredEvent(evt);
       }
     }
   }
