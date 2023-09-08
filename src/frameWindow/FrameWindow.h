@@ -34,12 +34,6 @@ class FrameWindow : FrameWindowResize {
 
   Color bgColor;
 
-  int x;
-  int y;
-  // int width;
-  // int height;
-  bool maximized;
-
   const char *winName;
 
   Window frameWindow;
@@ -104,4 +98,6 @@ class FrameWindow : FrameWindowResize {
   bool setResizeCursor(int x, int y);
 
   void setCursor(CursorKey k);
+
+  void updateSize();
 };

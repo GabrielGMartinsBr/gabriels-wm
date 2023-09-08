@@ -5,6 +5,7 @@
 
 #include <iostream>
 
+#include "../Log.hpp"
 #include "../toolkit/base/Color.h"
 #include "../toolkit/utils/WindowUtils.h"
 #include "cairo-xlib.h"
@@ -14,12 +15,12 @@ FrameWindow::FrameWindow(
   Central* ct,
   Window cWin
 ) :
-    maximized(false),
     bgColor(BG_COLOR_HEX),
     closeButton(0xff4030),
     maximizeButton(0x00df30),
     minimizeButton(0xefdf00)
 {
+  maximized = false;
   central = ct;
   display = ct->dpy;
   contentWindow = cWin;
@@ -103,6 +104,10 @@ void FrameWindow::handleXEvent(const XEvent evt)
 
 void FrameWindow::onExpose()
 {
+  if (isResizing) {
+    return;
+  }
+  // Log::out() << "expose";
   if (maximized && !isCairoMaximized) {
     cairo_xlib_surface_set_size(
       sfc,
@@ -159,6 +164,10 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
 
+  if (startResize(evt.x, evt.y)) {
+    return;
+  }
+
   // Drag
   if (
     !maximized
@@ -171,8 +180,16 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
 
 void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
 {
-  if (evt.window == frameWindow) {
+  if (evt.window != frameWindow) {
+    return;
+  }
+  if (isDragging) {
     stopDrag(evt.x, evt.y);
+    return;
+  }
+  if (isResizing) {
+    stopResize();
+    return;
   }
 }
 
@@ -184,6 +201,12 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
 
   if (isDragging) {
     updateDrag(evt.x, evt.y);
+    return;
+  }
+
+  if (isResizing) {
+    handleResizeMotion(evt.x, evt.y);
+    updateSize();
     return;
   }
 
@@ -415,4 +438,31 @@ bool FrameWindow::setResizeCursor(int _x, int _y)
     }
   }
   return true;
+}
+
+void FrameWindow::updateSize()
+{
+  int cWidth = width - border * 2;
+  int cHeight = height - header - border;
+  XMoveResizeWindow(display, frameWindow, x, y, width, height);
+  XResizeWindow(
+    display,
+    contentWindow,
+    cWidth,
+    cHeight
+  );
+  cairo_xlib_surface_set_size(
+    sfc,
+    width,
+    header
+  );
+  cairo_set_source_rgb(
+    cr,
+    bgColor.r,
+    bgColor.g,
+    bgColor.b
+  );
+  cairo_paint(cr);
+  drawTitle();
+  drawFrameButtons();
 }
