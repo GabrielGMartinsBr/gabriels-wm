@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-#include "../Log.hpp"
 #include "../toolkit/base/Color.h"
 #include "../toolkit/utils/WindowUtils.h"
 #include "cairo-xlib.h"
@@ -107,7 +106,6 @@ void FrameWindow::onExpose()
   if (isResizing) {
     return;
   }
-  // Log::out() << "expose";
   if (maximized && !isCairoMaximized) {
     cairo_xlib_surface_set_size(
       sfc,

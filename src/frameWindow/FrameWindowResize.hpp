@@ -1,4 +1,3 @@
-#include "../Log.hpp"
 #include "FrameWindowBase.hpp"
 #include "ResizeDirection.h"
 
@@ -111,14 +110,43 @@ class FrameWindowResize : public FrameWindowBase {
       case DOWN:
         height = startH + dy;
         break;
+      case UP_LEFT:
+        x += dx;
+        width = startW + (startX - x);
+        y += dy;
+        height = startH + (startY - y);
+        break;
+      case UP_RIGHT:
+        width = startW + dx;
+        y += dy;
+        height = startH + (startY - y);
+        break;
+      case DOWN_LEFT:
+        x += dx;
+        width = startW + (startX - x);
+        height = startH + dy;
+        break;
+      case DOWN_RIGHT:
+        width = startW + dx;
+        height = startH + dy;
+        break;
       default:
         break;
     }
+
     if (width < 96) {
       width = 96;
+      int eX = startX + startW - 96;
+      if (x > eX) {
+        x = eX;
+      }
     }
     if (height < 64) {
       height = 64;
+      int eY = startY + startH - 64;
+      if (y > eY) {
+        y = eY;
+      }
     }
   }
 };
