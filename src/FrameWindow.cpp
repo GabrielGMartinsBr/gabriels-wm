@@ -206,16 +206,28 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
     cursorChanged = true;
     switch (resizeDirection) {
       case ResizeDirection::LEFT:
-        setCursor(CursorKey::RESIZE_L);
+        setCursor(CursorKey::RESIZE_LEFT);
         break;
       case ResizeDirection::RIGHT:
-        setCursor(CursorKey::RESIZE_R);
+        setCursor(CursorKey::RESIZE_RIGHT);
         break;
       case ResizeDirection::UP:
-        setCursor(CursorKey::RESIZE_U);
+        setCursor(CursorKey::RESIZE_UP);
         break;
       case ResizeDirection::DOWN:
-        setCursor(CursorKey::RESIZE_D);
+        setCursor(CursorKey::RESIZE_DOWN);
+        break;
+      case ResizeDirection::UP_LEFT:
+        setCursor(CursorKey::RESIZE_UP_LEFT);
+        break;
+      case ResizeDirection::UP_RIGHT:
+        setCursor(CursorKey::RESIZE_UP_RIGHT);
+        break;
+      case ResizeDirection::DOWN_LEFT:
+        setCursor(CursorKey::RESIZE_DOWN_LEFT);
+        break;
+      case ResizeDirection::DOWN_RIGHT:
+        setCursor(CursorKey::RESIZE_DOWN_RIGHT);
         break;
       default: {
         cursorChanged = false;

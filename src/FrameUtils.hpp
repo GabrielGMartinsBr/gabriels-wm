@@ -17,38 +17,37 @@ enum ResizeDirection {
 };
 
 struct FrameUtils {
-  static bool isLResize(
-    FInst f, int x, int y
-  )
-  {
-    return y > f->topHeight && x < 2;
-  }
-
-  static bool isRResize(
-    FInst f, int x, int y
-  )
-  {
-    return y > f->topHeight
-           && x > f->width - 2;
-  }
-
-  static bool isBResize(
-    FInst f, int x, int y
-  )
-  {
-    return y > f->height - 3
-           && y < f->height;
-  }
-
   static ResizeDirection getResizeDirection(
     FInst f, int x, int y
   )
   {
     const int w = f->width;
     const int h = f->height;
-    const int headerHeight = f->topHeight;
     const int thick = 3;
 
+    if (
+      x < thick && y < thick
+    ) {
+      return ResizeDirection::UP_LEFT;
+    }
+    if (
+      x > w - thick && x < w
+      && y < thick
+    ) {
+      return ResizeDirection::UP_RIGHT;
+    }
+    if (
+      x < thick
+      && y > h - thick && y < h
+    ) {
+      return ResizeDirection::DOWN_LEFT;
+    }
+    if (
+      x < w && x > w - thick
+      && y > h - thick && y < h
+    ) {
+      return ResizeDirection::DOWN_RIGHT;
+    }
     if (x < thick) {
       return ResizeDirection::LEFT;
     }
