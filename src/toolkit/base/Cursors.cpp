@@ -12,8 +12,7 @@ Cursors::Cursors(Display* dis)
 void Cursors::createCursors()
 {
   cursorMap[CursorKey::DEFAULT] = XCreateFontCursor(display, XC_arrow);
-  // cursorMap[CursorKey::POINTER] = XCreateFontCursor(display, XC_hand2);
-  cursorMap[CursorKey::POINTER] = XCreateFontCursor(display, XC_top_left_arrow);
+  cursorMap[CursorKey::POINTER] = XCreateFontCursor(display, XC_hand2);
   cursorMap[CursorKey::RESIZE_LEFT] = XCreateFontCursor(display, XC_sb_left_arrow);
   cursorMap[CursorKey::RESIZE_RIGHT] = XCreateFontCursor(display, XC_sb_right_arrow);
   cursorMap[CursorKey::RESIZE_UP] = XCreateFontCursor(display, XC_sb_up_arrow);

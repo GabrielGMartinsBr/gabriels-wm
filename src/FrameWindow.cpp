@@ -183,61 +183,24 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
   if (evt.window != frameWindow) {
     return;
   }
+
   if (isDragging) {
     updateDrag(evt.x, evt.y);
     return;
   }
-  if (
-    minimizeButton.isHover(evt.x, evt.y)
-    || maximizeButton.isHover(evt.x, evt.y)
-    || closeButton.isHover(evt.x, evt.y)
-  ) {
-    if (!cursorChanged) {
-      setCursor(CursorKey::POINTER);
-      cursorChanged = true;
-    }
+
+  if (setResizeCursor(evt.x, evt.y)) {
+    cursorChanged = true;
     return;
   }
 
-  ResizeDirection resizeDirection = FrameUtils::getResizeDirection(
-    this, evt.x, evt.y
-  );
-  if (resizeDirection != ResizeDirection::NONE) {
+  if (setPointerCursor(evt.x, evt.y)) {
     cursorChanged = true;
-    switch (resizeDirection) {
-      case ResizeDirection::LEFT:
-        setCursor(CursorKey::RESIZE_LEFT);
-        break;
-      case ResizeDirection::RIGHT:
-        setCursor(CursorKey::RESIZE_RIGHT);
-        break;
-      case ResizeDirection::UP:
-        setCursor(CursorKey::RESIZE_UP);
-        break;
-      case ResizeDirection::DOWN:
-        setCursor(CursorKey::RESIZE_DOWN);
-        break;
-      case ResizeDirection::UP_LEFT:
-        setCursor(CursorKey::RESIZE_UP_LEFT);
-        break;
-      case ResizeDirection::UP_RIGHT:
-        setCursor(CursorKey::RESIZE_UP_RIGHT);
-        break;
-      case ResizeDirection::DOWN_LEFT:
-        setCursor(CursorKey::RESIZE_DOWN_LEFT);
-        break;
-      case ResizeDirection::DOWN_RIGHT:
-        setCursor(CursorKey::RESIZE_DOWN_RIGHT);
-        break;
-      default: {
-        cursorChanged = false;
-      }
-    }
     return;
   }
+
   if (cursorChanged) {
     setCursor(CursorKey::DEFAULT);
-    central->cursors->set(frameWindow, CursorKey::DEFAULT);
     cursorChanged = false;
   }
 }
@@ -406,4 +369,54 @@ bool FrameWindow::CircleButton::isHover(int _x, int _y)
 void FrameWindow::setCursor(CursorKey k)
 {
   central->cursors->set(frameWindow, k);
+}
+
+bool FrameWindow::setPointerCursor(int _x, int _y)
+{
+  if (
+    minimizeButton.isHover(_x, _y)
+    || maximizeButton.isHover(_x, _y)
+    || closeButton.isHover(_x, _y)
+  ) {
+    setCursor(CursorKey::POINTER);
+    return true;
+  }
+  return false;
+}
+
+bool FrameWindow::setResizeCursor(int _x, int _y)
+{
+  ResizeDirection resizeDirection = FrameUtils::getResizeDirection(
+    this, _x, _y
+  );
+  switch (resizeDirection) {
+    case ResizeDirection::LEFT:
+      setCursor(CursorKey::RESIZE_LEFT);
+      break;
+    case ResizeDirection::RIGHT:
+      setCursor(CursorKey::RESIZE_RIGHT);
+      break;
+    case ResizeDirection::UP:
+      setCursor(CursorKey::RESIZE_UP);
+      break;
+    case ResizeDirection::DOWN:
+      setCursor(CursorKey::RESIZE_DOWN);
+      break;
+    case ResizeDirection::UP_LEFT:
+      setCursor(CursorKey::RESIZE_UP_LEFT);
+      break;
+    case ResizeDirection::UP_RIGHT:
+      setCursor(CursorKey::RESIZE_UP_RIGHT);
+      break;
+    case ResizeDirection::DOWN_LEFT:
+      setCursor(CursorKey::RESIZE_DOWN_LEFT);
+      break;
+    case ResizeDirection::DOWN_RIGHT:
+      setCursor(CursorKey::RESIZE_DOWN_RIGHT);
+      break;
+    default: {
+      return false;
+    }
+  }
+  return true;
 }

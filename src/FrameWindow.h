@@ -100,5 +100,9 @@ class FrameWindow {
   void updateDrag(int x, int y);
   void stopDrag(int x, int y);
 
+  bool setPointerCursor(int x, int y);
+  
+  bool setResizeCursor(int x, int y);
+
   void setCursor(CursorKey k);
 };
