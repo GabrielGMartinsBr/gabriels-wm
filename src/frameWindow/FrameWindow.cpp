@@ -343,6 +343,8 @@ void FrameWindow::startDrag(int _x, int _y)
   isDragging = true;
   dragInitX = _x;
   dragInitY = _y;
+  setCursor(CursorKey::MOVE);
+  cursorChanged = true;
 }
 
 void FrameWindow::updateDrag(int _x, int _y)
@@ -360,6 +362,8 @@ void FrameWindow::updateDrag(int _x, int _y)
 void FrameWindow::stopDrag(int _x, int _y)
 {
   isDragging = false;
+  setCursor(CursorKey::DEFAULT);
+  cursorChanged = false;
 }
 
 // CircleButton

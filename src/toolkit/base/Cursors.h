@@ -6,6 +6,8 @@
 enum CursorKey {
   DEFAULT,
   POINTER,
+  GRAB,
+  MOVE,
   RESIZE_LEFT,
   RESIZE_RIGHT,
   RESIZE_UP,

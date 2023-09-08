@@ -12,6 +12,8 @@ Cursors::Cursors(Display* dis)
 void Cursors::createCursors()
 {
   cursorMap[CursorKey::DEFAULT] = XCreateFontCursor(display, XC_arrow);
+  cursorMap[CursorKey::MOVE] = XCreateFontCursor(display, XC_fleur);
+  cursorMap[CursorKey::GRAB] = XCreateFontCursor(display, XC_hand1);
   cursorMap[CursorKey::POINTER] = XCreateFontCursor(display, XC_hand2);
   cursorMap[CursorKey::RESIZE_LEFT] = XCreateFontCursor(display, XC_sb_left_arrow);
   cursorMap[CursorKey::RESIZE_RIGHT] = XCreateFontCursor(display, XC_sb_right_arrow);
