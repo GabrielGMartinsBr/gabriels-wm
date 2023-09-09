@@ -13,7 +13,6 @@ file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
 
 include_directories(src)
 
-
 # Create the executable target
 add_executable(${PROJECT_NAME} ${source_files})
 
@@ -54,3 +53,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE ${XDAMAGE_INCLUDE_DIRS})
 find_package(Cairo REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CAIRO_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${CAIRO_INCLUDE_DIRS})
+
+
+# Copy Assets
+add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/assets
+            ${CMAKE_BINARY_DIR}/assets
+)
