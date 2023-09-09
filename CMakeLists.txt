@@ -11,7 +11,7 @@ enable_testing()
 # List all source files
 file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
 
-include_directories(src/base)
+include_directories(src)
 
 
 # Create the executable target

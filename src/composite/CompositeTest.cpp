@@ -5,7 +5,7 @@
 #include <X11/extensions/Xrender.h>
 #include <X11/extensions/composite.h>
 
-#include "Log.hpp"
+#include "base/Log.hpp"
 #include "cairo-xlib.h"
 #include "cairo.h"
 
