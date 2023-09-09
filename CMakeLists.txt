@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.15)
 project(GabrielsWM VERSION 0.1.0)
 
 # Set additional module path
@@ -10,6 +10,8 @@ enable_testing()
 
 # List all source files
 file(GLOB_RECURSE source_files src/*.cpp src/*.hpp)
+
+include_directories(src/base)
 
 
 # Create the executable target

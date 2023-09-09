@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include "Log.hpp"
+#include "base/Log.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
