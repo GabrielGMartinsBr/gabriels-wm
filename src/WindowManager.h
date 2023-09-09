@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "desktop/Desktop.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
 #include "toolkit/Central.h"
@@ -22,6 +23,7 @@ class WindowManager {
   Central *central;
   Display *display;
   Window rootWindow;
+  Desktop desktop;
 
   Launcher launcher;
 

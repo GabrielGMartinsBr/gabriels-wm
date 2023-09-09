@@ -6,8 +6,8 @@
 
 #include <iostream>
 
-#include "frameWindow/FrameWindow.h"
 #include "Log.hpp"
+#include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
 #include "utils/codes.h"
@@ -57,6 +57,8 @@ void WindowManager::run()
   std::cout << "Window Manager has been init!\n";
 
   getPreExistingWindows();
+
+  desktop.init(central);
 
   XFlush(display);
 
