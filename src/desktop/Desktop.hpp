@@ -8,11 +8,24 @@
 #include "cairo.h"
 #include "toolkit/Central.h"
 
+// TODO: Asynchronous Redraws
+// TODO: Use X Damage Events
+// TODO: Multithreading for drawing operations
+
 class Desktop : public DesktopBase {
   Central *ct;
   cairo_surface_t *img_sfc;
 
   bool flagBgImage = false;
+
+ public:
+  ~Desktop()
+  {
+    cairo_destroy(cr);
+    cairo_surface_destroy(sfc);
+    cairo_surface_destroy(img_sfc);
+    XDestroyWindow(dpy, win);
+  }
 
  public:
   void init(Central *central)
@@ -68,7 +81,7 @@ class Desktop : public DesktopBase {
     if (!flagBgImage) {
       renderBgImage();
     } else {
-      // refreshImage();
+      refreshImage();
     }
   }
 
@@ -112,6 +125,7 @@ class Desktop : public DesktopBase {
 
     cairo_set_source_surface(cr, img_sfc, 0, 0);
     cairo_paint(cr);
+    Log::out() << "created img";
   }
 
   void refreshImage()

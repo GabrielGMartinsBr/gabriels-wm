@@ -66,12 +66,13 @@ void WindowManager::run()
   while (true) {
     XNextEvent(display, &evt);
 
-    desktop.handleXEvent(evt);
-
     launcher.handleXEvent(evt);
     for (auto &f : framesMap) {
       f.second->handleXEvent(evt);
     }
+
+    desktop.handleXEvent(evt);
+
     switch (evt.type) {
       case CreateNotify:
         handleCreateNotify(evt.xcreatewindow);
