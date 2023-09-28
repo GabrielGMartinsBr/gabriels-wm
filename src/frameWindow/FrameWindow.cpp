@@ -162,7 +162,7 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     return;
   }
 
-  if (startResize(evt.x, evt.y)) {
+  if (startResize(evt.x, evt.y, evt.x_root, evt.y_root)) {
     return;
   }
 
@@ -203,7 +203,7 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
   }
 
   if (isResizing) {
-    handleResizeMotion(evt.x, evt.y);
+    handleResizeMotion(evt.x_root, evt.y_root);
     updateSize();
     return;
   }

@@ -1,5 +1,6 @@
 #include "FrameWindowBase.hpp"
 #include "ResizeDirection.h"
+#include "base/Log.hpp"
 
 typedef FrameResizeDirection ResizeDir;
 
@@ -15,13 +16,13 @@ class FrameWindowResize : public FrameWindowBase {
   ResizeDir resizeDirection;
   bool isResizing;
 
-  bool startResize(int _x, int _y)
+  bool startResize(int _x, int _y, int x_root, int y_root)
   {
     resizeDirection = getResizeDirection(_x, _y);
     isResizing = resizeDirection != ResizeDir::NONE;
     if (isResizing) {
-      start_X = _x;
-      start_Y = _y;
+      start_X = x_root;
+      start_Y = y_root;
       startX = x;
       startY = y;
       startW = width;
@@ -95,35 +96,37 @@ class FrameWindowResize : public FrameWindowBase {
     int dx = _x - start_X;
     int dy = _y - start_Y;
 
+    Log::out() << dx;
+
     switch (resizeDirection) {
       case LEFT:
-        x += dx;
-        width = startW + (startX - x);
+        x = start_X + dx;
+        width = startW - dx;
         break;
       case RIGHT:
         width = startW + dx;
         break;
       case UP:
-        y += dy;
-        height = startH + (startY - y);
+        y = start_Y + dy;
+        height = startH - dy;
         break;
       case DOWN:
         height = startH + dy;
         break;
       case UP_LEFT:
-        x += dx;
-        width = startW + (startX - x);
-        y += dy;
-        height = startH + (startY - y);
+        x = start_X + dx;
+        y = start_Y + dy;
+        width = startW - dx;
+        height = startH - dy;
         break;
       case UP_RIGHT:
+        y = start_Y + dy;
         width = startW + dx;
-        y += dy;
-        height = startH + (startY - y);
+        height = startH - dy;
         break;
       case DOWN_LEFT:
-        x += dx;
-        width = startW + (startX - x);
+        x = start_X + dx;
+        width = startW - dx;
         height = startH + dy;
         break;
       case DOWN_RIGHT:
