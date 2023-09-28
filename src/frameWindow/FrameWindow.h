@@ -8,6 +8,7 @@
 #include "../toolkit/Tracer.h"
 #include "../toolkit/base/Color.h"
 #include "FrameWindowResize.hpp"
+#include "frameWindow/InitSizePosVec.h"
 
 // TODO: Create Color Struct
 // TODO: Create Small Title surface
@@ -66,8 +67,7 @@ class FrameWindow : FrameWindowResize {
   CircleButton minimizeButton;
 
   bool isDragging;
-  int dragInitX;
-  int dragInitY;
+  InitSizePosVec dragInit;
   bool cursorChanged;
   bool isCairoMaximized;
 
@@ -89,7 +89,7 @@ class FrameWindow : FrameWindowResize {
 
   void drawElements();
 
-  void startDrag(int x, int y);
+  void startDrag(int rootX, int rootY);
   void updateDrag(int x, int y);
   void stopDrag(int x, int y);
 

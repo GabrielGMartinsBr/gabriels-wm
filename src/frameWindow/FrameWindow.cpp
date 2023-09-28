@@ -172,7 +172,7 @@ void FrameWindow::handleButtonPress(const XButtonPressedEvent evt)
     && evt.y > border
     && evt.y < header
   ) {
-    startDrag(evt.x, evt.y);
+    startDrag(evt.x_root, evt.y_root);
   }
 }
 
@@ -182,7 +182,7 @@ void FrameWindow::handleButtonRelease(const XButtonReleasedEvent evt)
     return;
   }
   if (isDragging) {
-    stopDrag(evt.x, evt.y);
+    stopDrag(evt.x_root, evt.y_root);
     return;
   }
   if (isResizing) {
@@ -198,7 +198,7 @@ void FrameWindow::handleMotion(const XMotionEvent evt)
   }
 
   if (isDragging) {
-    updateDrag(evt.x, evt.y);
+    updateDrag(evt.x_root, evt.y_root);
     return;
   }
 
@@ -338,11 +338,11 @@ void FrameWindow::closeWindow()
   XSendEvent(display, contentWindow, false, NoEventMask, &event);
 }
 
-void FrameWindow::startDrag(int _x, int _y)
+void FrameWindow::startDrag(int rootX, int rootY)
 {
   isDragging = true;
-  dragInitX = _x;
-  dragInitY = _y;
+  dragInit.x = rootX;
+  dragInit.y = rootY;
   setCursor(CursorKey::MOVE);
   cursorChanged = true;
 }
@@ -352,10 +352,10 @@ void FrameWindow::updateDrag(int _x, int _y)
   if (!isDragging) {
     return;
   }
-  int dx = _x - dragInitX;
-  int dy = _y - dragInitY;
-  x += dx;
-  y += dy;
+  int dx = _x - dragInit.x;
+  int dy = _y - dragInit.y;
+  x = dx;
+  y = dy;
   XMoveWindow(display, frameWindow, x, y);
 }
 
