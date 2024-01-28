@@ -4,9 +4,11 @@
 #include <X11/Xlib.h>
 
 #include <iostream>
+#include <memory>
 #include <stdexcept>
 #include <unordered_map>
 
+#include "components/panel/PanelComponent.hpp"
 #include "desktop/Desktop.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
@@ -25,10 +27,14 @@ class WindowManager {
   Window rootWindow;
   Desktop desktop;
 
+  std::unique_ptr<PanelComponent> panel = nullptr;
+
   Launcher launcher;
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
+
+  void createPanel();
 
   void handleCreateNotify(const XCreateWindowEvent event);
   void handleConfigureRequest(const XConfigureRequestEvent event);

@@ -5,8 +5,10 @@
 #include <X11/cursorfont.h>
 
 #include <iostream>
+#include <memory>
 
 #include "base/Log.hpp"
+#include "components/panel/PanelComponent.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
@@ -59,6 +61,7 @@ void WindowManager::run()
   getPreExistingWindows();
 
   desktop.init(central);
+  createPanel();
 
   XFlush(display);
 
@@ -115,6 +118,11 @@ void WindowManager::run()
       }
     }
   }
+}
+
+void WindowManager::createPanel()
+{
+  panel = std::make_unique<PanelComponent>(central->dpy, central->rootWindow);
 }
 
 //
