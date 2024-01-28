@@ -8,6 +8,7 @@
 #include <memory>
 
 #include "base/Log.hpp"
+#include "components/dash/DashComponent.hpp"
 #include "components/panel/PanelComponent.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "launcher/Launcher.h"
@@ -26,8 +27,8 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
   return 0;
 }
 
-WindowManager::WindowManager(Central *ct) :
-    launcher(ct)
+WindowManager::WindowManager(Central *ct)
+// :launcher(ct)
 {
   central = ct;
   display = central->dpy;
@@ -61,7 +62,9 @@ void WindowManager::run()
   getPreExistingWindows();
 
   desktop.init(central);
+
   createPanel();
+  createDash();
 
   XFlush(display);
 
@@ -69,7 +72,7 @@ void WindowManager::run()
   while (true) {
     XNextEvent(display, &evt);
 
-    launcher.handleXEvent(evt);
+    // launcher.handleXEvent(evt);
     for (auto &f : framesMap) {
       f.second->handleXEvent(evt);
     }
@@ -123,6 +126,11 @@ void WindowManager::run()
 void WindowManager::createPanel()
 {
   panel = std::make_unique<PanelComponent>(central->dpy, central->rootWindow);
+}
+
+void WindowManager::createDash()
+{
+  dash = std::make_unique<DashComponent>(central->dpy, central->rootWindow);
 }
 
 //

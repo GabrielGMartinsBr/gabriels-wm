@@ -8,10 +8,10 @@
 #include <stdexcept>
 #include <unordered_map>
 
+#include "components/dash/DashComponent.hpp"
 #include "components/panel/PanelComponent.hpp"
 #include "desktop/Desktop.hpp"
 #include "frameWindow/FrameWindow.h"
-#include "launcher/Launcher.h"
 #include "toolkit/Central.h"
 
 class WindowManager {
@@ -28,13 +28,13 @@ class WindowManager {
   Desktop desktop;
 
   std::unique_ptr<PanelComponent> panel = nullptr;
-
-  Launcher launcher;
+  std::unique_ptr<DashComponent> dash = nullptr;
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
 
   void createPanel();
+  void createDash();
 
   void handleCreateNotify(const XCreateWindowEvent event);
   void handleConfigureRequest(const XConfigureRequestEvent event);
