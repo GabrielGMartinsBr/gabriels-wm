@@ -1,2 +1,2 @@
 #!/bin/bash
-Xephyr -br -ac -noreset -screen 1100x640 :100
+Xephyr -br -ac -noreset -screen 1100x1000 :100
