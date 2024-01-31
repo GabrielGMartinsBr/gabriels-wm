@@ -19,6 +19,7 @@ class BaseWindow {
   BaseWindow& x(int v)
   {
     _x = v;
+    updatePosition();
     return *this;
   }
 
@@ -26,6 +27,7 @@ class BaseWindow {
   BaseWindow& y(int v)
   {
     _y = v;
+    updatePosition();
     return *this;
   }
 
@@ -33,6 +35,7 @@ class BaseWindow {
   BaseWindow& width(uint v)
   {
     _width = v;
+    updateSize();
     return *this;
   }
 
@@ -40,6 +43,7 @@ class BaseWindow {
   BaseWindow& height(uint v)
   {
     _height = v;
+    updateSize();
     return *this;
   }
 
@@ -47,6 +51,7 @@ class BaseWindow {
   BaseWindow& borderWidth(uint v)
   {
     _borderWidth = v;
+    updateBorderWidth();
     return *this;
   }
 
@@ -54,6 +59,7 @@ class BaseWindow {
   BaseWindow& borderColor(ulong v)
   {
     _borderColor = v;
+    updateBorderColor();
     return *this;
   }
 
@@ -61,6 +67,7 @@ class BaseWindow {
   BaseWindow& backgroundColor(ulong v)
   {
     _backgroundColor = v;
+    updateBackground();
     return *this;
   }
 
@@ -68,6 +75,7 @@ class BaseWindow {
   {
     _x = x;
     _y = y;
+    updatePosition();
     return *this;
   }
 
@@ -77,6 +85,7 @@ class BaseWindow {
     _y = y;
     _width = width;
     _height = height;
+    updateSizeAndPosition();
     return *this;
   }
 
@@ -117,6 +126,36 @@ class BaseWindow {
   void mapWindow()
   {
     XMapWindow(display, window);
+  }
+
+  void updatePosition()
+  {
+    XMoveWindow(display, window, _x, _y);
+  }
+
+  void updateSize()
+  {
+    XResizeWindow(display, window, _width, _height);
+  }
+
+  void updateSizeAndPosition()
+  {
+    XMoveResizeWindow(display, window, _x, _y, _width, _height);
+  }
+
+  void updateBorderWidth()
+  {
+    XSetWindowBorderWidth(display, window, _borderWidth);
+  }
+
+  void updateBorderColor()
+  {
+    XSetWindowBorder(display, window, _borderColor);
+  }
+
+  void updateBackground()
+  {
+    XSetWindowBackground(display, window, _backgroundColor);
   }
 };
 
