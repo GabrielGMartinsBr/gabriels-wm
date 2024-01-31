@@ -67,7 +67,6 @@ void WindowManager::run()
   createDash();
 
   App::BaseWindow win(display, rootWindow);
-
   win.rect(100, 100, 300, 80)
     .backgroundColor(0x4477aa)
     .create()

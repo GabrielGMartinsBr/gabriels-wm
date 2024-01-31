@@ -3,6 +3,8 @@
 #include <X11/X.h>
 #include <X11/Xlib.h>
 
+#include <stdexcept>
+
 #include "types.h"
 
 namespace App {
@@ -114,6 +116,8 @@ class BaseWindow {
   Window parent;
   Window window;
 
+  bool created = false;
+
   void createWindow()
   {
     window = XCreateSimpleWindow(
@@ -121,40 +125,62 @@ class BaseWindow {
       _x, _y, _width, _height,
       _borderWidth, _borderColor, _backgroundColor
     );
+    created = true;
   }
 
   void mapWindow()
   {
+    if (!created) {
+      throw std::runtime_error("Window was not created yet.");
+    }
     XMapWindow(display, window);
   }
 
   void updatePosition()
   {
+    if (!created) {
+      return;
+    }
     XMoveWindow(display, window, _x, _y);
   }
 
   void updateSize()
   {
+    if (!created) {
+      return;
+    }
     XResizeWindow(display, window, _width, _height);
   }
 
   void updateSizeAndPosition()
   {
+    if (!created) {
+      return;
+    }
     XMoveResizeWindow(display, window, _x, _y, _width, _height);
   }
 
   void updateBorderWidth()
   {
+    if (!created) {
+      return;
+    }
     XSetWindowBorderWidth(display, window, _borderWidth);
   }
 
   void updateBorderColor()
   {
+    if (!created) {
+      return;
+    }
     XSetWindowBorder(display, window, _borderColor);
   }
 
   void updateBackground()
   {
+    if (!created) {
+      return;
+    }
     XSetWindowBackground(display, window, _backgroundColor);
   }
 };
