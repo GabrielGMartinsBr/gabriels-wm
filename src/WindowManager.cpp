@@ -7,11 +7,11 @@
 #include <iostream>
 #include <memory>
 
+#include "base/BaseWindow.hpp"
 #include "base/Log.hpp"
 #include "components/dash/DashComponent.hpp"
 #include "components/panel/PanelComponent.hpp"
 #include "frameWindow/FrameWindow.h"
-#include "launcher/Launcher.h"
 #include "toolkit/Elementor.h"
 #include "utils/codes.h"
 
@@ -65,6 +65,13 @@ void WindowManager::run()
 
   createPanel();
   createDash();
+
+  App::BaseWindow win(display, rootWindow);
+
+  win.rect(100, 100, 300, 80)
+    .backgroundColor(0x4477aa)
+    .create()
+    .show();
 
   XFlush(display);
 
