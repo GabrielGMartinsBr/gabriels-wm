@@ -9,16 +9,16 @@
 
 namespace App {
 
-class BaseWindow {
+class BasicWindow {
  public:
-  BaseWindow(Display* display, Window parent)
+  BasicWindow(Display* display, Window parent)
   {
     this->display = display;
     this->parent = parent;
   }
 
   int x() { return _x; }
-  BaseWindow& x(int v)
+  BasicWindow& x(int v)
   {
     _x = v;
     updatePosition();
@@ -26,7 +26,7 @@ class BaseWindow {
   }
 
   int y() { return _y; }
-  BaseWindow& y(int v)
+  BasicWindow& y(int v)
   {
     _y = v;
     updatePosition();
@@ -34,7 +34,7 @@ class BaseWindow {
   }
 
   uint width() { return _width; }
-  BaseWindow& width(uint v)
+  BasicWindow& width(uint v)
   {
     _width = v;
     updateSize();
@@ -42,7 +42,7 @@ class BaseWindow {
   }
 
   uint height() { return _height; }
-  BaseWindow& height(uint v)
+  BasicWindow& height(uint v)
   {
     _height = v;
     updateSize();
@@ -50,7 +50,7 @@ class BaseWindow {
   }
 
   uint borderWidth() { return _borderWidth; }
-  BaseWindow& borderWidth(uint v)
+  BasicWindow& borderWidth(uint v)
   {
     _borderWidth = v;
     updateBorderWidth();
@@ -58,7 +58,7 @@ class BaseWindow {
   }
 
   ulong borderColor() { return _borderColor; }
-  BaseWindow& borderColor(ulong v)
+  BasicWindow& borderColor(ulong v)
   {
     _borderColor = v;
     updateBorderColor();
@@ -66,14 +66,14 @@ class BaseWindow {
   }
 
   ulong backgroundColor() { return _backgroundColor; }
-  BaseWindow& backgroundColor(ulong v)
+  BasicWindow& backgroundColor(ulong v)
   {
     _backgroundColor = v;
     updateBackground();
     return *this;
   }
 
-  BaseWindow& position(int x, int y)
+  BasicWindow& position(int x, int y)
   {
     _x = x;
     _y = y;
@@ -81,7 +81,7 @@ class BaseWindow {
     return *this;
   }
 
-  BaseWindow& rect(int x, int y, int width, int height)
+  BasicWindow& rect(int x, int y, int width, int height)
   {
     _x = x;
     _y = y;
@@ -91,13 +91,13 @@ class BaseWindow {
     return *this;
   }
 
-  BaseWindow& create()
+  BasicWindow& create()
   {
     createWindow();
     return *this;
   }
 
-  BaseWindow& show()
+  BasicWindow& show()
   {
     mapWindow();
     return *this;
