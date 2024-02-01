@@ -17,6 +17,11 @@ class BasicWindow {
     this->parent = parent;
   }
 
+  Window xWindow()
+  {
+    return window;
+  }
+
   int x() { return _x; }
   BasicWindow& x(int v)
   {

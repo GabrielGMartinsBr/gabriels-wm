@@ -67,6 +67,8 @@ void WindowManager::run()
   createDash();
   createFrame();
 
+  frame->show();
+
   XFlush(display);
 
   XEvent evt;
