@@ -9,6 +9,7 @@
 #include <unordered_map>
 
 #include "components/dash/DashComponent.hpp"
+#include "components/frame/FrameComponent.hpp"
 #include "components/panel/PanelComponent.hpp"
 #include "desktop/Desktop.hpp"
 #include "frameWindow/FrameWindow.h"
@@ -29,12 +30,15 @@ class WindowManager {
 
   std::unique_ptr<PanelComponent> panel = nullptr;
   std::unique_ptr<DashComponent> dash = nullptr;
+  std::unique_ptr<App::FrameComponent> frame = nullptr;
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
+  
 
   void createPanel();
   void createDash();
+  void createFrame();
 
   void handleCreateNotify(const XCreateWindowEvent event);
   void handleConfigureRequest(const XConfigureRequestEvent event);

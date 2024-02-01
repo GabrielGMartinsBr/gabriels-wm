@@ -7,9 +7,9 @@
 #include <iostream>
 #include <memory>
 
-#include "base/BasicWindow.hpp"
 #include "base/Log.hpp"
 #include "components/dash/DashComponent.hpp"
+#include "components/frame/FrameComponent.hpp"
 #include "components/panel/PanelComponent.hpp"
 #include "frameWindow/FrameWindow.h"
 #include "toolkit/Elementor.h"
@@ -65,12 +65,7 @@ void WindowManager::run()
 
   createPanel();
   createDash();
-
-  App::BasicWindow win(display, rootWindow);
-  win.rect(100, 100, 300, 80)
-    .backgroundColor(0x4477aa)
-    .create()
-    .show();
+  createFrame();
 
   XFlush(display);
 
@@ -137,6 +132,11 @@ void WindowManager::createPanel()
 void WindowManager::createDash()
 {
   dash = std::make_unique<DashComponent>(central->dpy, central->rootWindow);
+}
+
+void WindowManager::createFrame()
+{
+  frame = std::make_unique<App::FrameComponent>(central->dpy, central->rootWindow);
 }
 
 //
