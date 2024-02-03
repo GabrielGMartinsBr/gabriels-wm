@@ -9,7 +9,6 @@
 #include "base/Surface.hpp"
 #include "base/SurfaceContext.hpp"
 #include "base/consts.h"
-#include "cairo.h"
 
 namespace App {
 
@@ -33,9 +32,8 @@ class FrameComponent {
  private:
   Display* display;
   Window parent;
-  // cairo_surface_t* sfc;
-  Surface* sfc;
-  SurfaceContext* sfx;
+  Pointer<Surface> sfc;
+  Pointer<SurfaceContext> sfx;
 
   BasicWindow window;
 
@@ -54,10 +52,8 @@ class FrameComponent {
 
   void createSurface()
   {
-    int screen = DefaultScreen(display);
-    Visual* visual = DefaultVisual(display, screen);
-    sfc = new Surface(display, window.xWindow(), width, height);
-    sfx = new SurfaceContext(sfc->cairoSurface());
+    sfc = std::make_unique<Surface>(display, window.xWindow(), width, height);
+    sfx = sfc->createContextPtr();
   }
 
   void drawContent()

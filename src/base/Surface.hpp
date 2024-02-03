@@ -10,14 +10,19 @@ namespace App {
 
 class Surface {
  public:
-  Surface(Display *dpy, Drawable drawable, uint width, uint height)
+  Surface(Display *display, Drawable drawable, uint width, uint height)
   {
-    create(dpy, drawable, width, height);
+    create(display, drawable, width, height);
   }
 
   SurfaceContext createContext()
   {
     return SurfaceContext(sfc);
+  }
+
+  Pointer<SurfaceContext> createContextPtr()
+  {
+    return std::make_unique<SurfaceContext>(sfc);
   }
 
   cairo_surface_t *cairoSurface()
