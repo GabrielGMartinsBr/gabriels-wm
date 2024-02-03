@@ -34,12 +34,12 @@ class WindowManager {
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
-  
 
   void createPanel();
   void createDash();
   void createFrame();
 
+  void handleXEvent(const XEvent &event);
   void handleCreateNotify(const XCreateWindowEvent event);
   void handleConfigureRequest(const XConfigureRequestEvent event);
   void handleMapRequest(const XMapRequestEvent event);

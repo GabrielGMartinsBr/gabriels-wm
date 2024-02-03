@@ -4,8 +4,10 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 
+#include <chrono>
 #include <iostream>
 #include <memory>
+#include <thread>
 
 #include "base/Log.hpp"
 #include "components/dash/DashComponent.hpp"
@@ -73,55 +75,12 @@ void WindowManager::run()
 
   XEvent evt;
   while (true) {
-    XNextEvent(display, &evt);
-
-    // launcher.handleXEvent(evt);
-    for (auto &f : framesMap) {
-      f.second->handleXEvent(evt);
-    }
-
-    desktop.handleXEvent(evt);
-
-    switch (evt.type) {
-      case CreateNotify:
-        handleCreateNotify(evt.xcreatewindow);
-        break;
-      case ConfigureRequest:
-        handleConfigureRequest(evt.xconfigurerequest);
-        break;
-      case ConfigureNotify:
-        break;
-      case MapRequest:
-        handleMapRequest(evt.xmaprequest);
-        break;
-      case MapNotify:
-        handleMapNotify(evt.xmap);
-        break;
-      case UnmapNotify:
-        handleUnmapNotify(evt.xunmap);
-        break;
-      case ReparentNotify:
-        handleReparentNotify(evt.xreparent);
-        break;
-      case Expose:
-        break;
-      case ButtonPress:
-        // std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
-
-        handleButtonPress(evt.xbutton);
-        break;
-      case ButtonRelease:
-        handleButtonRelease(evt.xbutton);
-        break;
-      case MotionNotify:
-        handleMotionNotify(evt.xmotion);
-        break;
-      case DestroyNotify:
-        handleDestroyNotify(evt.xdestroywindow);
-        break;
-      default: {
-        // handleIgnoredEvent(evt);
-      }
+    if (XPending(display) > 0) {
+      XNextEvent(display, &evt);
+      handleXEvent(evt);
+    } else {
+      frame->anime();
+      std::this_thread::sleep_for(std::chrono::milliseconds(16));
     }
   }
 }
@@ -144,6 +103,58 @@ void WindowManager::createFrame()
 //
 // Handlers
 //
+
+void WindowManager::handleXEvent(const XEvent &evt)
+{
+  // launcher.handleXEvent(evt);
+  for (auto &f : framesMap) {
+    f.second->handleXEvent(evt);
+  }
+
+  desktop.handleXEvent(evt);
+
+  switch (evt.type) {
+    case CreateNotify:
+      handleCreateNotify(evt.xcreatewindow);
+      break;
+    case ConfigureRequest:
+      handleConfigureRequest(evt.xconfigurerequest);
+      break;
+    case ConfigureNotify:
+      break;
+    case MapRequest:
+      handleMapRequest(evt.xmaprequest);
+      break;
+    case MapNotify:
+      handleMapNotify(evt.xmap);
+      break;
+    case UnmapNotify:
+      handleUnmapNotify(evt.xunmap);
+      break;
+    case ReparentNotify:
+      handleReparentNotify(evt.xreparent);
+      break;
+    case Expose:
+      break;
+    case ButtonPress:
+      // std::cout << "ButtonPress: " << evt.xbutton.window << '\n';
+
+      handleButtonPress(evt.xbutton);
+      break;
+    case ButtonRelease:
+      handleButtonRelease(evt.xbutton);
+      break;
+    case MotionNotify:
+      handleMotionNotify(evt.xmotion);
+      break;
+    case DestroyNotify:
+      handleDestroyNotify(evt.xdestroywindow);
+      break;
+    default: {
+      // handleIgnoredEvent(evt);
+    }
+  }
+}
 
 void WindowManager::handleCreateNotify(const XCreateWindowEvent event)
 {

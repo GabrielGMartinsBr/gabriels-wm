@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Color.hpp"
+#include "base/consts.h"
 #include "cairo.h"
 
 namespace App {
@@ -27,7 +28,7 @@ class SurfaceContext {
   }
 
   // Set Source Color By RGB Float
-  SurfaceContext& setSourceColor(float red, float green, float blue)
+  SurfaceContext& setSourceColor2(float red, float green, float blue)
   {
     color.setColor(red, green, blue);
     updateColor();
@@ -93,6 +94,13 @@ class SurfaceContext {
   )
   {
     cairo_arc(cr, xc, yc, radius, angle1, angle2);
+    return *this;
+  }
+
+  // Circle
+  SurfaceContext& circle(double xc, double yc, double radius)
+  {
+    cairo_arc(cr, xc, yc, radius, 0, PI2);
     return *this;
   }
 

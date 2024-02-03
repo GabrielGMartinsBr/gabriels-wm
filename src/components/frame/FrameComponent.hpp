@@ -30,6 +30,11 @@ class FrameComponent {
     drawContent();
   }
 
+  void anime()
+  {
+    doAnime();
+  }
+
  private:
   Display* display;
   Window parent;
@@ -43,6 +48,8 @@ class FrameComponent {
   uint width = 640;
   uint height = 480;
   ulong bg = 0x333336;
+
+  int i = 0;
 
   void createWindow()
   {
@@ -92,7 +99,25 @@ class FrameComponent {
       .setLineJoin(CAIRO_LINE_JOIN_ROUND)
       .lineTo(100, 110)
       .stroke();
+  }
 
+  void doAnime()
+  {
+    sfx->setSourceColor(0x333334).paint();
+    i = (i + 3) % 512;
+
+    int j = i;
+    if (i > 255) {
+      j = 512 - i;
+    }
+
+    sfx->setSourceColor("#fc7")
+      .circle(10 + j, 100, 9)
+      .fill();
+
+    sfx->setSourceColor(j % 255, ((3 * i)/2) % 255, (2 * i) % 255)
+      .circle(96, 200, 32)
+      .fill();
   }
 };
 
