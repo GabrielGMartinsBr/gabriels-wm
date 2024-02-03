@@ -6,9 +6,9 @@
 
 #include "base/BasicWindow.hpp"
 #include "base/Color.hpp"
+#include "base/Surface.hpp"
 #include "base/SurfaceContext.hpp"
 #include "base/consts.h"
-#include "cairo-xlib.h"
 #include "cairo.h"
 
 namespace App {
@@ -33,7 +33,8 @@ class FrameComponent {
  private:
   Display* display;
   Window parent;
-  cairo_surface_t* sfc;
+  // cairo_surface_t* sfc;
+  Surface* sfc;
   SurfaceContext* sfx;
 
   BasicWindow window;
@@ -55,10 +56,8 @@ class FrameComponent {
   {
     int screen = DefaultScreen(display);
     Visual* visual = DefaultVisual(display, screen);
-    sfc = cairo_xlib_surface_create(
-      display, window.xWindow(), visual, width, height
-    );
-    sfx = new SurfaceContext(sfc);
+    sfc = new Surface(display, window.xWindow(), width, height);
+    sfx = new SurfaceContext(sfc->cairoSurface());
   }
 
   void drawContent()
