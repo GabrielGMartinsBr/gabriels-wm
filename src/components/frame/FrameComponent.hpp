@@ -34,7 +34,7 @@ class FrameComponent {
   Display* display;
   Window parent;
   cairo_surface_t* sfc;
-  SurfaceContext* ctx;
+  SurfaceContext* sfx;
 
   BasicWindow window;
 
@@ -58,21 +58,19 @@ class FrameComponent {
     sfc = cairo_xlib_surface_create(
       display, window.xWindow(), visual, width, height
     );
-    ctx = new SurfaceContext(sfc);
+    sfx = new SurfaceContext(sfc);
   }
 
   void drawContent()
   {
-    ctx->setSourceColor(0x333334);
-    ctx->paint();
-
-    ctx->setSourceColor("#fff");
-    ctx->rectangle(16, 16, width - 32, height - 32);
-    ctx->fill();
-
-    ctx->setSourceColor("#fa3");
-    ctx->arc(100, 100, 10, 0, PI2);
-    ctx->fill();
+    sfx->setSourceColor(0x333334)
+      .paint()
+      .setSourceColor("#fff")
+      .rectangle(16, 16, width - 32, height - 32)
+      .fill()
+      .setSourceColor("#fa3")
+      .arc(100, 100, 10, 0, PI2)
+      .fill();
   }
 };
 
