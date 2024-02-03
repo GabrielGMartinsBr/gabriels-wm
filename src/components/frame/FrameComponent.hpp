@@ -21,6 +21,7 @@ class FrameComponent {
     this->display = dpy;
     this->parent = parent;
     createWindow();
+    setupXInputs();
     createSurface();
   }
 
@@ -33,6 +34,18 @@ class FrameComponent {
   void anime()
   {
     doAnime();
+  }
+
+  void handleXEvent(const XEvent& evt)
+  {
+    if (evt.xany.window != window.xWindow()) {
+      return;
+    }
+
+    if (evt.type == MotionNotify) {
+      xm = evt.xmotion.x;
+      ym = evt.xmotion.y;
+    }
   }
 
  private:
@@ -50,12 +63,29 @@ class FrameComponent {
   ulong bg = 0x333336;
 
   int i = 0;
+  int xm = 0;
+  int ym = 0;
 
   void createWindow()
   {
     window.rect(x, y, width, height)
       .backgroundColor(bg)
       .create();
+  }
+
+  void setupXInputs()
+  {
+    long evtMasks = SubstructureRedirectMask
+                    | SubstructureNotifyMask
+                    | ExposureMask
+                    | ButtonPressMask
+                    | ButtonReleaseMask
+                    | EnterWindowMask
+                    | LeaveWindowMask
+                    | PointerMotionMask
+                    | VisibilityChangeMask;
+
+    XSelectInput(display, window.xWindow(), evtMasks);
   }
 
   void createSurface()
@@ -115,8 +145,12 @@ class FrameComponent {
       .circle(10 + j, 100, 9)
       .fill();
 
-    sfx->setSourceColor(j % 255, ((3 * i)/2) % 255, (2 * i) % 255)
+    sfx->setSourceColor(j % 255, ((3 * i) / 2) % 255, (2 * i) % 255)
       .circle(96, 200, 32)
+      .fill();
+
+    sfx->setSourceColor("#444")
+      .circle(xm, ym, 32)
       .fill();
   }
 };

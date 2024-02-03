@@ -13,6 +13,7 @@
 #include "components/panel/PanelComponent.hpp"
 #include "desktop/Desktop.hpp"
 #include "frameWindow/FrameWindow.h"
+#include "launcher/Launcher.h"
 #include "toolkit/Central.h"
 
 class WindowManager {
@@ -27,6 +28,7 @@ class WindowManager {
   Display *display;
   Window rootWindow;
   Desktop desktop;
+  // Launcher launcher;
 
   std::unique_ptr<PanelComponent> panel = nullptr;
   std::unique_ptr<DashComponent> dash = nullptr;

@@ -77,7 +77,9 @@ void WindowManager::run()
   while (true) {
     if (XPending(display) > 0) {
       XNextEvent(display, &evt);
+      // launcher.handleXEvent(evt);
       handleXEvent(evt);
+      frame->handleXEvent(evt);
     } else {
       frame->anime();
       std::this_thread::sleep_for(std::chrono::milliseconds(16));
@@ -106,7 +108,6 @@ void WindowManager::createFrame()
 
 void WindowManager::handleXEvent(const XEvent &evt)
 {
-  // launcher.handleXEvent(evt);
   for (auto &f : framesMap) {
     f.second->handleXEvent(evt);
   }
