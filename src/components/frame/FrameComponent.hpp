@@ -25,6 +25,11 @@ class FrameComponent {
     createSurface();
   }
 
+  Window getWindow()
+  {
+    return window.xWindow();
+  }
+
   void show()
   {
     window.show();
@@ -34,6 +39,13 @@ class FrameComponent {
   void anime()
   {
     doAnime();
+  }
+
+  void setPos(int x, int y)
+  {
+    this->x = x;
+    this->y = y;
+    this->window.position(x, y);
   }
 
   void handleXEvent(const XEvent& evt)
@@ -58,7 +70,7 @@ class FrameComponent {
 
   int x = 230;
   int y = 260;
-  uint width = 640;
+  uint width = 520;
   uint height = 480;
   ulong bg = 0x333336;
 
@@ -150,7 +162,7 @@ class FrameComponent {
       .fill();
 
     sfx->setSourceColor("#444")
-      .circle(xm, ym, 32)
+      .circle(xm, ym, 12)
       .fill();
   }
 };

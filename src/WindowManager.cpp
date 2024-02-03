@@ -30,7 +30,7 @@ int onWindowManagerDetected(Display *display, XErrorEvent *e)
 }
 
 WindowManager::WindowManager(Central *ct)
-// :launcher(ct)
+// : launcher(ct)
 {
   central = ct;
   display = central->dpy;
@@ -41,6 +41,16 @@ WindowManager::~WindowManager()
 {
   XCloseDisplay(display);
   Log::out() << "Closing Window Manager";
+}
+
+void drawAnimation(App::FrameComponent *frame2, Display *display)
+{
+  while (true) {
+    frame2->anime();
+    std::this_thread::sleep_for(std::chrono::milliseconds(32));
+
+    XFlush(display);
+  }
 }
 
 void WindowManager::run()
@@ -70,8 +80,11 @@ void WindowManager::run()
   createFrame();
 
   frame->show();
+  frame2->show();
 
   XFlush(display);
+
+  std::thread animationThread(drawAnimation, &*frame2, display);
 
   XEvent evt;
   while (true) {
@@ -80,11 +93,14 @@ void WindowManager::run()
       // launcher.handleXEvent(evt);
       handleXEvent(evt);
       frame->handleXEvent(evt);
+      frame2->handleXEvent(evt);
     } else {
       frame->anime();
-      std::this_thread::sleep_for(std::chrono::milliseconds(16));
+      std::this_thread::sleep_for(std::chrono::milliseconds(32));
     }
   }
+
+  animationThread.join();
 }
 
 void WindowManager::createPanel()
@@ -100,6 +116,12 @@ void WindowManager::createDash()
 void WindowManager::createFrame()
 {
   frame = std::make_unique<App::FrameComponent>(central->dpy, central->rootWindow);
+  frame2 = std::make_unique<App::FrameComponent>(central->dpy, central->rootWindow);
+
+  Log::out() << frame->getWindow() << " | " << frame2->getWindow();
+
+  frame->setPos(20, 200);
+  frame2->setPos(560, 200);
 }
 
 //

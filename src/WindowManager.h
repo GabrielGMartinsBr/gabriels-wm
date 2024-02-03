@@ -32,7 +32,8 @@ class WindowManager {
 
   std::unique_ptr<PanelComponent> panel = nullptr;
   std::unique_ptr<DashComponent> dash = nullptr;
-  std::unique_ptr<App::FrameComponent> frame = nullptr;
+  App::Pointer<App::FrameComponent> frame = nullptr;
+  App::Pointer<App::FrameComponent> frame2 = nullptr;
 
   std::unordered_map<Window, Window> frames;
   std::unordered_map<Window, FrameWindow *> framesMap;
