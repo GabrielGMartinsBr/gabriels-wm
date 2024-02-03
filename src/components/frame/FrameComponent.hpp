@@ -6,10 +6,10 @@
 
 #include "base/BasicWindow.hpp"
 #include "base/Color.hpp"
+#include "base/SurfaceContext.hpp"
 #include "base/consts.h"
 #include "cairo-xlib.h"
 #include "cairo.h"
-#include "toolkit/base/Color.h"
 
 namespace App {
 
@@ -34,7 +34,7 @@ class FrameComponent {
   Display* display;
   Window parent;
   cairo_surface_t* sfc;
-  cairo_t* cr;
+  SurfaceContext* ctx;
 
   BasicWindow window;
 
@@ -58,25 +58,21 @@ class FrameComponent {
     sfc = cairo_xlib_surface_create(
       display, window.xWindow(), visual, width, height
     );
-    cr = cairo_create(sfc);
+    ctx = new SurfaceContext(sfc);
   }
 
   void drawContent()
   {
-    Color bg(0x333334);
-    Color color("#fff");
+    ctx->setSourceColor(0x333334);
+    ctx->paint();
 
-    cairo_set_source_rgb(cr, bg.red(), bg.green(), bg.blue());
-    cairo_paint(cr);
+    ctx->setSourceColor("#fff");
+    ctx->rectangle(16, 16, width - 32, height - 32);
+    ctx->fill();
 
-    cairo_set_source_rgb(cr, color.red(), color.green(), color.blue());
-    cairo_rectangle(cr, 16, 16, width - 32, height - 32);
-    cairo_fill(cr);
-
-    color.setColor("#fa3");
-    cairo_set_source_rgb(cr, color.red(), color.green(), color.blue());
-    cairo_arc(cr, 100, 100, 10, 0, PI2);
-    cairo_fill(cr);
+    ctx->setSourceColor("#fa3");
+    ctx->arc(100, 100, 10, 0, PI2);
+    ctx->fill();
   }
 };
 
