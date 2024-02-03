@@ -9,6 +9,7 @@
 #include "base/Surface.hpp"
 #include "base/SurfaceContext.hpp"
 #include "base/consts.h"
+#include "cairo.h"
 
 namespace App {
 
@@ -65,7 +66,33 @@ class FrameComponent {
       .fill()
       .setSourceColor("#fa3")
       .arc(100, 100, 10, 0, PI2)
-      .fill();
+      .fill()
+      .setSourceColor("#37a")
+      .rectangle(200, 200, 200, 200)
+      .lineWidth(9.0)
+      .stroke()
+      .setSourceColor("#333")
+      .lineWidth(6.0)
+      .setLineCap(CAIRO_LINE_CAP_BUTT)
+      .moveTo(100, 100)
+      .lineTo(200, 100)
+      .stroke()
+      .lineWidth(12.0)
+      .setLineCap(CAIRO_LINE_CAP_SQUARE)
+      .setLineJoin(CAIRO_LINE_JOIN_BEVEL)
+      .moveTo(100, 110)
+      .lineTo(200, 110)
+      .lineTo(200, 200)
+      .stroke()
+      .moveTo(200, 200)
+      .setLineJoin(CAIRO_LINE_JOIN_MITER)
+      .lineTo(100, 200)
+      .stroke()
+      .moveTo(100, 200)
+      .setLineJoin(CAIRO_LINE_JOIN_ROUND)
+      .lineTo(100, 110)
+      .stroke();
+
   }
 };
 
